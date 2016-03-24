@@ -4,7 +4,7 @@
   "description": "C/C++ Program Optimization Helper",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -25,5 +25,9 @@
   },
   "homepage": "https://github.com/albertsgrc/optim#readme",
   "dependencies": {
+    "chalk256": "^5.1.0",
+    "commander": "^2.9.0",
+    "lodash": "^4.6.1",
+    "unique-filename": "^1.1.0"
   }
 }

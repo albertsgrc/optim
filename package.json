@@ -1,0 +1,29 @@
+{
+  "name": "optim",
+  "version": "0.0.0",
+  "description": "C/C++ Program Optimization Helper",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/albertsgrc/optim.git"
+  },
+  "keywords": [
+    "optimization",
+    "program",
+    "automatization",
+    "helper",
+    "check",
+    "profile"
+  ],
+  "author": "Albert Segarra Roca",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/albertsgrc/optim/issues"
+  },
+  "homepage": "https://github.com/albertsgrc/optim#readme",
+  "dependencies": {
+  }
+}

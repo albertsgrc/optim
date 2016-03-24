@@ -8,7 +8,30 @@ cli = require 'commander'
 module.exports = cli
 
 ######### - Argument checks and preprocess - ##########
-cli.notEnoughArguments = process.argv.length <= 2
+N_META_ARGUMENTS = 2
+
+cli.notEnoughArguments = process.argv.length <= N_META_ARGUMENTS
+
+# Replace the command argument if it is a second alias defined for convenience
+# (Commander only allows one alias per command)
+replaceSecondAlias = ->
+    SECOND_ALIAS =
+        spd: 'speedup'
+        rm: 'clean'
+        eq: 'equal'
+        an: 'analyze'
+        pf: 'profile'
+        everything: 'all'
+
+    realCommand = SECOND_ALIAS[process.argv[N_META_ARGUMENTS]]
+    process.argv[N_META_ARGUMENTS] = realCommand if realCommand?
+
+checkCommandExists = ->
+    COMMANDS = ['speedup', 's', 'clean', 'C', 'equal', 'e', 'compile', 'c',
+                'profile', 'p']
+
+    # TODO: Replace for logger method call
+    console.log "Invalid command" unless process.argv[N_META_ARGUMENTS] in COMMANDS
 
 ######### - CLI command, options and version definitions- ##########
 cli.version version
@@ -26,7 +49,7 @@ cli
         "Forward arguments to the programs"
     .option '-l, --last',
         "Only check equality with the program with greatest lexicographic name"
-    .action -> console.log "Equal"
+    .action -> console.log "Equal" # TODO: Implement
 
 # Compile command
 cli
@@ -36,7 +59,7 @@ cli
     .option '-f, --flags [program-specification:]<flags-string>',
         "Indicate flags to forward to the compilation of programs"
     .option '-a, --all', 'Compile all matching programs in lexicographic order'
-    .action -> console.log "Compile"
+    .action -> console.log "Compile" # TODO: Implement
 
 # Speedup command
 cli
@@ -55,7 +78,7 @@ cli
         "Forward arguments to the programs"
     .option '-l, --last',
         "Only compute info for the program with greatest lexicographic name"
-    .action -> console.log "Speedup"
+    .action -> console.log "Speedup" # TODO: Implement
 
 # Profile command
 cli
@@ -66,7 +89,7 @@ cli
         "Profile with OProfile's opannotate"
     .option '-g, --gprof [:options-string]', "Profile with gprof"
     .option '-n, --no-clean', "Do not clean profiler's intermediate files"
-    .action -> console.log "Profile"
+    .action -> console.log "Profile" # TODO: Implement
 
 # TODO: Analyze = Speedup + Profile command
 # TODO: All = Check + Speedup + Profile command
@@ -79,4 +102,7 @@ cli
     .action -> console.log "Clean"
 
 cli.help() if cli.notEnoughArguments
+replaceSecondAlias()
+checkCommandExists()
+
 cli.parse process.argv

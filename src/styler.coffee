@@ -7,14 +7,14 @@ supports256 = TERM? and /^xterm-256(?:color)?/.test(TERM)
 styles256 =
     error: chalk("#e74c3c")
     warning: chalk("#f39c12")
-    info: chalk("#3498db")
-    verbose: chalk("#16a085").italic
+    info: chalk("#00d7ff")
+    verbose: chalk("#5fffd7")
 
     cmd: chalk("#95a5a6").bold.underline
     id: chalk("#95a5a6").italic.bold
     value: chalk.bold
 
-    okay: chalk("#2ecc71")
+    okay: chalk("#87ff00")
     normal: chalk("#f1c40f")
     bad: chalk("#9b59b6")
 
@@ -22,7 +22,7 @@ styles16 =
     error: chalk.red
     warning: chalk.yellow
     info: chalk.blue
-    verbose: chalk.blue.italic
+    verbose: chalk.cyan
 
     cmd: chalk.white.underline
     id: chalk.cyan.italic.bold
@@ -39,4 +39,5 @@ assert(prop of styles256, "Style #{prop} missing in 256") for prop of styles16
 
 module.exports = if supports256 then styles256 else styles16
 
+# Testing code
 #module.exports[style].log("Style #{style}") for style of styles16

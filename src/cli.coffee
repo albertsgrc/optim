@@ -14,14 +14,10 @@ cli.notEnoughArguments = process.argv.length <= N_META_ARGUMENTS
 
 # Replace the command argument if it is a second alias defined for convenience
 # (Commander only allows one alias per command)
-replaceSecondAlias = ->
+tryToReplaceSecondAlias = ->
     SECOND_ALIAS =
-        spd: 'speedup'
-        rm: 'clean'
-        eq: 'equal'
-        an: 'analyze'
-        pf: 'profile'
-        everything: 'all'
+        spd: 'speedup', rm: 'clean', eq: 'equal', pf: 'profile'
+        make: 'compile'
 
     realCommand = SECOND_ALIAS[process.argv[N_META_ARGUMENTS]]
     process.argv[N_META_ARGUMENTS] = realCommand if realCommand?
@@ -102,7 +98,7 @@ cli
     .action -> console.log "Clean"
 
 cli.help() if cli.notEnoughArguments
-replaceSecondAlias()
+tryToReplaceSecondAlias()
 checkCommandExists()
 
 cli.parse process.argv

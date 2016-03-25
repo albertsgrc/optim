@@ -8,6 +8,7 @@ styles256 =
     error: chalk("#e74c3c")
     warning: chalk("#f39c12")
     info: chalk("#3498db")
+    verbose: chalk("#16a085").italic
 
     cmd: chalk("#95a5a6").bold.underline
     id: chalk("#95a5a6").italic.bold
@@ -21,6 +22,7 @@ styles16 =
     error: chalk.red
     warning: chalk.yellow
     info: chalk.blue
+    verbose: chalk.blue.italic
 
     cmd: chalk.white.underline
     id: chalk.cyan.italic.bold
@@ -36,3 +38,5 @@ assert(Object.keys(styles256).length is Object.keys(styles16).length,
 assert(prop of styles256, "Style #{prop} missing in 256") for prop of styles16
 
 module.exports = if supports256 then styles256 else styles16
+
+#module.exports[style].log("Style #{style}") for style of styles16

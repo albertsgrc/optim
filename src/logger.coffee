@@ -33,8 +33,8 @@ fold = (str, cols = MAX_COLS_PER_LINE) ->
         else # Quite strange there's no space in 70 character string...
             cutString[...-1] + "-\n" + LEFT_PADSTRING_LONG_LINES + fold(str[cols-1..])
 
-createWriter = (txt, styler, stream = process.stdout) => (msg, endline = true) =>
-        msg += "\n" if endline
+createWriter = (txt, styler, stream = process.stdout) => (msg, endline = on) =>
+        msg += "\n" if endline is on
         stream.write tag(txt, styler) + fold(msg)
         @
 
@@ -56,9 +56,9 @@ createWriter = (txt, styler, stream = process.stdout) => (msg, endline = true) =
 
 @error = @e = do ->
     errorWriter = createWriter ERROR, styler.error, process.stderr
-    (msg, end = true, exitCode = 1) ->
+    (msg, end = yes, exitCode = 1) ->
         ret = errorWriter msg
-        process.exit exitCode if end
+        process.exit exitCode if end is yes
         ret
 
 

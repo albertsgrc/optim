@@ -6,7 +6,7 @@ supports256 = TERM? and /^xterm-256(?:color)?/.test(TERM)
 
 styles256 =
     error: chalk("#e74c3c")
-    warning: chalk("#f39c12")
+    warn: chalk("#f39c12")
     info: chalk("#00d7ff")
     verbose: chalk("#5fffd7")
 
@@ -20,7 +20,7 @@ styles256 =
 
 styles16 =
     error: chalk.red
-    warning: chalk.yellow
+    warn: chalk.yellow
     info: chalk.blue
     verbose: chalk.cyan
 

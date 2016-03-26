@@ -28,6 +28,7 @@
     "chalk256": "^5.1.0",
     "commander": "^2.9.0",
     "lodash": "^4.6.1",
+    "shelljs": "^0.6.0",
     "unique-filename": "^1.1.0"
   }
 }

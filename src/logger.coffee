@@ -1,6 +1,7 @@
 _ = require 'lodash'
 { clearLine, cursorTo } = require 'readline'
 { stripColor } = require 'chalk'
+{ inspect } = require 'util'
 
 styler = require './styler'
 
@@ -48,12 +49,14 @@ fold = (string, leftPad = LEFT_PADSTRING_LONG_LINES) ->
         last
 
 createWriter = (txt, styler, stream = stdout) => (msg, { endline = on, margin = off } = {}) =>
-        msg += "\n" if endline is on
-        if margin
-            stream.write "\n " + tag(txt, styler) + fold(msg, LEFT_PADSTRING_LONG_LINES + " ") + "\n"
-        else
-            stream.write tag(txt, styler) + fold(msg)
-        @
+    msg = inspect msg unless _.isString msg
+
+    msg += "\n" if endline is on
+    if margin
+        stream.write "\n " + tag(txt, styler) + fold(msg, LEFT_PADSTRING_LONG_LINES + " ") + "\n"
+    else
+        stream.write tag(txt, styler) + fold(msg)
+    @
 
 # Exposed methods
 @write = (str, stream = stdout) => stream.write str; @
@@ -90,6 +93,8 @@ this
         cut cause it's too long to be read correctly in the terminal.")
     .e("This sentence is also too long. But note that it has a endline,\nso
         it shouldn't be cut because it already fits in the screen.")
+    .i(9)
+    .i({ hello: 'world' })
     .warn("This is a warning")
     .error("An error occurred", margin: on )
     .info("Be informed")

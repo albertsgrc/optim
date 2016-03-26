@@ -11,7 +11,7 @@ module.exports = @
 { stdout, stderr } = process
 
 # Constants
-[INFO,WARN,ERROR,VERBOSE] = TAGS = ["INFO", "WARN", "ERROR", "VERBS"]
+[ INFO, WARN, ERROR, VERBOSE ] = TAGS = [ "INFO", "WARN", "ERROR", "VERBS" ]
 LEFT_MARGIN = _.maxBy(TAGS, _.size).length + 1
 TAG_INDICATOR = ': '
 LEFT_PADSTRING_LONG_LINES = _.repeat(" ", LEFT_MARGIN + TAG_INDICATOR.length)

@@ -10,8 +10,8 @@ styles256 =
     info: chalk("#00d7ff")
     verbose: chalk("#5fffd7")
 
-    cmd: chalk("#95a5a6").bold.underline
-    id: chalk("#95a5a6").italic.bold
+    cmd: chalk.underline
+    id: chalk.italic
     value: chalk.bold
 
     okay: chalk("#87ff00")
@@ -24,8 +24,8 @@ styles16 =
     info: chalk.blue
     verbose: chalk.cyan
 
-    cmd: chalk.white.underline
-    id: chalk.cyan.italic.bold
+    cmd: chalk.underline
+    id: chalk.italic
     value: chalk.bold
 
     okay: chalk.green

@@ -1,18 +1,21 @@
 _ = require 'lodash'
 assert = require 'assert'
-readline = require 'readline'
+{ clearLine, cursorTo } = require 'readline'
 
 styler = require './styler'
 { verbose } = require './cli'
 
 module.exports = @
 
+# Alias
+{ stdout, stderr, exit } = process
+
 # Constants
 [INFO,WARN,ERROR,VERBOSE] = TAGS = ["INFO", "WARN", "ERROR", "VERBS"]
 LEFT_MARGIN = _.maxBy(TAGS, _.size).length + 1
 TAG_INDICATOR = ': '
 LEFT_PADSTRING_LONG_LINES = _.repeat(" ", LEFT_MARGIN + TAG_INDICATOR.length)
-MAX_COLS_PER_LINE = Math.max 10, process.stdout.columns - LEFT_PADSTRING_LONG_LINES.length - 1
+MAX_COLS_PER_LINE = Math.max 10, stdout.columns - LEFT_PADSTRING_LONG_LINES.length - 1
 
 # Private methods
 tag = (txt, style) -> style(_.padEnd(txt, LEFT_MARGIN)) + TAG_INDICATOR
@@ -33,7 +36,7 @@ fold = (str, cols = MAX_COLS_PER_LINE) ->
         else # Quite strange there's no space in 70 character string...
             cutString[...-1] + "-\n" + LEFT_PADSTRING_LONG_LINES + fold(str[cols-1..])
 
-createWriter = (txt, styler, stream = process.stdout) => (msg, endline = on) =>
+createWriter = (txt, styler, stream = stdout) => (msg, endline = on) =>
         msg += "\n" if endline is on
         stream.write tag(txt, styler) + fold(msg)
         @
@@ -41,10 +44,7 @@ createWriter = (txt, styler, stream = process.stdout) => (msg, endline = on) =>
 # Exposed methods
 @endLine = => console.log(""); @
 
-@eraseLine = =>
-    readline.clearLine(process.stdout)
-    readline.cursorTo(process.stdout, 0)
-    @
+@eraseLine = (stream = stdout) => clearLine(stream); cursorTo(stream, 0); @
 
 @verbose = @v = if verbose? then createWriter VERBOSE, styler.verbose else => @
 
@@ -55,10 +55,10 @@ createWriter = (txt, styler, stream = process.stdout) => (msg, endline = on) =>
 @warn = @w = createWriter WARN, styler.warn
 
 @error = @e = do ->
-    errorWriter = createWriter ERROR, styler.error, process.stderr
+    errorWriter = createWriter ERROR, styler.error, stderr
     (msg, end = yes, exitCode = 1) ->
         ret = errorWriter msg
-        process.exit exitCode if end is yes
+        exit exitCode if end is yes
         ret
 
 
@@ -77,7 +77,7 @@ this
     .updateInfo("My name is joan")
     .endLine()
 
-process.stdout.write "Shouldn't appear"; @eraseLine()
+stdout.write "Shouldn't appear"; @eraseLine()
 
 @error("This ends with error code 2", true, 2)
 @info("Should'nt be printed")

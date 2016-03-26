@@ -67,7 +67,7 @@ createWriter = (txt, styler, stream = stdout) => (msg, { endline = on, margin = 
 
 @error = @e = do ->
     errorWriter = createWriter ERROR, styler.error, stderr
-    (msg, { margin = off, exit = yes, exitCode = 1 } = {}) ->
+    (msg, { margin = off, exit = no, exitCode = 1 } = {}) ->
         ret = errorWriter msg, margin: margin, endline: on
         process.exit exitCode if exit is yes
         ret
@@ -80,7 +80,7 @@ this
     .w("This is a normal sentence which has a lot of columns, so it should be
         cut cause it's too long to be read correctly in the terminal.")
     .warn("This is a warning")
-    .error("An error occurred", margin: on, exit: no )
+    .error("An error occurred", margin: on )
     .info("Be informed")
     .verbose("Don't talk so much")
     .updateInfo("My name is albert")
@@ -89,6 +89,6 @@ this
 
 stdout.write "Shouldn't appear"; @eraseLine()
 
-@error("This ends with error code 2", exitCode: 2)
+@error("This ends with error code 2", exit: yes, exitCode: 2)
 @info("Should'nt be printed")
 ###

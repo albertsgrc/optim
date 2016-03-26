@@ -30,8 +30,8 @@ checkCommandExists = ->
 
     cmd = process.argv[N_META_ARGUMENTS]
     unless cmd in COMMANDS
-        logger.e "#{styler.id cmd} is not a optim command. Run #{styler.id 'optim --help'}
-            for the list of commands", on
+        logger.e("#{styler.id cmd} is not a optim command. Run #{styler.id 'optim --help'}
+                  for the list of commands", margin: on)
 
 ######### - CLI command, options and version definitions- ##########
 cli.version version

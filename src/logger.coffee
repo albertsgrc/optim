@@ -8,7 +8,7 @@ styler = require './styler'
 module.exports = @
 
 # Alias
-{ stdout, stderr, exit } = process
+{ stdout, stderr } = process
 
 # Constants
 [INFO,WARN,ERROR,VERBOSE] = TAGS = ["INFO", "WARN", "ERROR", "VERBS"]
@@ -38,7 +38,7 @@ fold = (str, leftPad = LEFT_PADSTRING_LONG_LINES) ->
         else # Quite strange there's no space in 70 character string...
             cutString[...-1] + "-\n" + leftPad + fold(str[cutString.length-1..])
 
-createWriter = (txt, styler, stream = stdout) => (msg, endline = on, margin = off) =>
+createWriter = (txt, styler, stream = stdout) => (msg, { endline = on, margin = off } = {}) =>
         msg += "\n" if endline is on
         if margin
             stream.write "\n " + tag(txt, styler) + fold(msg, LEFT_PADSTRING_LONG_LINES + " ") + "\n"
@@ -57,15 +57,15 @@ createWriter = (txt, styler, stream = stdout) => (msg, endline = on, margin = of
 
 @info = @i = createWriter INFO, styler.info
 
-@updateInfo = (msg) => @eraseLine(); @info(msg, false); @
+@updateInfo = (msg) => @eraseLine(); @info(msg, endline: off); @
 
 @warn = @w = createWriter WARN, styler.warn
 
 @error = @e = do ->
     errorWriter = createWriter ERROR, styler.error, stderr
-    (msg, margin = off, end = yes, exitCode = 1) ->
-        ret = errorWriter msg, on, margin
-        exit exitCode if end is yes
+    (msg, { margin = off, exit = yes, exitCode = 1 } = {}) ->
+        ret = errorWriter msg, margin: margin, endline: on
+        process.exit exitCode if exit is yes
         ret
 
 # Testing Code
@@ -76,7 +76,7 @@ this
     .w("This is a normal sentence which has a lot of columns, so it should be
         cut cause it's too long to be read correctly in the terminal.")
     .warn("This is a warning")
-    .error("An error occurred", on, no)
+    .error("An error occurred", margin: on, exit: no )
     .info("Be informed")
     .verbose("Don't talk so much")
     .updateInfo("My name is albert")
@@ -85,6 +85,6 @@ this
 
 stdout.write "Shouldn't appear"; @eraseLine()
 
-@error("This ends with error code 2", off, true, 2)
+@error("This ends with error code 2", exitCode: 2)
 @info("Should'nt be printed")
 ###

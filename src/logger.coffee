@@ -1,5 +1,4 @@
 _ = require 'lodash'
-
 { clearLine, cursorTo } = require 'readline'
 { stripColor } = require 'chalk'
 
@@ -18,25 +17,35 @@ LEFT_PADSTRING_LONG_LINES = _.repeat(" ", LEFT_MARGIN + TAG_INDICATOR.length)
 MAX_COLS_PER_LINE = stdout.columns - 1
 
 # Private methods
-getNonOcuppyingLength = (str) -> str.length - stripColor(str.replace("\n", "")).length
+getNonOcuppyingLength = (str) -> str.length - stripColor(str).length
 
 tag = (txt, style) -> style(_.padEnd(txt, LEFT_MARGIN)) + TAG_INDICATOR
 
-# Assumes there is no endline within the string
-fold = (str, leftPad = LEFT_PADSTRING_LONG_LINES) ->
+fold = (string, leftPad = LEFT_PADSTRING_LONG_LINES) ->
     cols = Math.max 10, MAX_COLS_PER_LINE - leftPad.length
-    nonOcuppyingLength = getNonOcuppyingLength(str)
-    if str.length - nonOcuppyingLength <= cols # Base case
-         str
-    else # Recursive case
-        cutString = str[...cols + nonOcuppyingLength]
-        lastSpace = cutString.lastIndexOf(' ')
+    chunks = string.split("\n")
 
-        # This if-else is in order to avoid cutting a word in half in case it's possible
-        if lastSpace >= 0
-            cutString[...lastSpace] + "\n" + leftPad + fold(str[lastSpace+1..])
-        else # Quite strange there's no space in 70 character string...
-            cutString[...-1] + "-\n" + leftPad + fold(str[cutString.length-1..])
+    foldImm = (str) ->
+        nonOcuppyingLength = getNonOcuppyingLength(str)
+        if str.length - nonOcuppyingLength <= cols # Base case
+             str
+        else # Recursive case
+            cutString = str[...cols + nonOcuppyingLength]
+            lastSpace = cutString.lastIndexOf(' ')
+
+            # This if-else is in order to avoid cutting a word in half in case it's possible
+            if lastSpace >= 0
+                cutString[...lastSpace] + "\n" + leftPad + fold(str[lastSpace+1..])
+            else # Quite strange there's no space in 70 character string...
+                cutString[...-1] + "-\n" + leftPad + fold(str[cutString.length-1..])
+
+    [prefix..., last] = chunks.map foldImm
+    # The last endline (if exists, that's what this condition is for),
+    # should not be followed by the padString
+    if prefix.length
+        prefix.join("\n" + leftPad) + "\n" + last
+    else
+        last
 
 createWriter = (txt, styler, stream = stdout) => (msg, { endline = on, margin = off } = {}) =>
         msg += "\n" if endline is on
@@ -79,6 +88,8 @@ this
         theresnospaceanditcannotbereadcorrectlyiftheterminalistoonarrow.")
     .w("This is a normal sentence which has a lot of columns, so it should be
         cut cause it's too long to be read correctly in the terminal.")
+    .e("This sentence is also too long. But note that it has a endline,\nso
+        it shouldn't be cut because it already fits in the screen.")
     .warn("This is a warning")
     .error("An error occurred", margin: on )
     .info("Be informed")

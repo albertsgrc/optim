@@ -1,13 +1,11 @@
 #! /usr/bin/env coffee
 
-cli = require 'commander'
+module.exports = global.cli = cli = require 'commander'
 
 # Get version number from package.json to avoid redundancy
 { version } = require '../package'
 logger = require './logger'
 styler = require './styler'
-
-module.exports = global.cli = cli
 
 ######### - Argument checks and preprocess - ##########
 N_META_ARGUMENTS = 2

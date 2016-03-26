@@ -53,7 +53,11 @@ createWriter = (txt, styler, stream = stdout) => (msg, { endline = on, margin = 
 
 @eraseLine = (stream = stdout) => clearLine(stream); cursorTo(stream, 0); @
 
-@verbose = @v = if global.cli?.verbose? then createWriter VERBOSE, styler.verbose else => @
+@verbose = @v = do =>
+    verboseWriter = createWriter VERBOSE, styler.verbose
+    (args...) =>
+        verboseWriter args... if global.cli?.verbose?
+        @
 
 @info = @i = createWriter INFO, styler.info
 

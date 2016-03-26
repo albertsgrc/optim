@@ -4,8 +4,10 @@ cli = require 'commander'
 
 # Get version number from package.json to avoid redundancy
 { version } = require '../package'
+logger = require './logger'
+styler = require './styler'
 
-module.exports = cli
+module.exports = global.cli = cli
 
 ######### - Argument checks and preprocess - ##########
 N_META_ARGUMENTS = 2
@@ -26,8 +28,10 @@ checkCommandExists = ->
     COMMANDS = ['speedup', 's', 'clean', 'C', 'equal', 'e', 'compile', 'c',
                 'profile', 'p']
 
-    # TODO: Replace for logger method call
-    console.log "Invalid command" unless process.argv[N_META_ARGUMENTS] in COMMANDS
+    cmd = process.argv[N_META_ARGUMENTS]
+    unless cmd in COMMANDS
+        logger.e "#{styler.id cmd} is not a optim command. Run #{styler.id 'optim --help'}
+            for the list of commands", on
 
 ######### - CLI command, options and version definitions- ##########
 cli.version version

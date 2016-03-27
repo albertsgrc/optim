@@ -16,6 +16,7 @@ LEFT_MARGIN = _.maxBy(TAGS, _.size).length + 1
 TAG_INDICATOR = ': '
 LEFT_PADSTRING_LONG_LINES = _.repeat(" ", LEFT_MARGIN + TAG_INDICATOR.length)
 MAX_COLS_PER_LINE = stdout.columns - 1
+MINIMUM_COLS = 15
 
 # Private methods
 getNonOcuppyingLength = (str) -> str.length - stripColor(str).length
@@ -23,7 +24,7 @@ getNonOcuppyingLength = (str) -> str.length - stripColor(str).length
 tag = (txt, style) -> style(_.padEnd(txt, LEFT_MARGIN)) + TAG_INDICATOR
 
 fold = (string, leftPad = LEFT_PADSTRING_LONG_LINES) ->
-    cols = Math.max 10, MAX_COLS_PER_LINE - leftPad.length
+    cols = Math.max MINIMUM_COLS, MAX_COLS_PER_LINE - leftPad.length
     chunks = string.split("\n")
 
     foldImm = (str) ->
@@ -61,7 +62,7 @@ createWriter = (txt, styler, stream = stdout) => (msg, { endline = on, margin = 
 # Exposed methods
 @write = (str, stream = stdout) => stream.write str; @
 
-@endLine = => console.log(""); @
+@endLine = (stream = stdout) => stream.write "\n"; @
 
 @eraseLine = (stream = stdout) => clearLine(stream); cursorTo(stream, 0); @
 

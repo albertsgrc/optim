@@ -97,6 +97,8 @@ cli
     .command 'clean'
     .alias 'C'
     .description "Remove all executables in the directory"
+    .option '-r, --recursive', "Recursively delete executables on all directories"
+    .option '-d, --deep', "Also remove oprofile output and all files ending in .out"
     .action -> console.log "Clean"
 
 cli.help() if cli.notEnoughArguments

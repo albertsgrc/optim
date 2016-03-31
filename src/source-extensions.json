@@ -1,0 +1,26 @@
+{
+    "c": {
+        "compiler": "gcc",
+        "language": "C"
+    },
+    "cc": {
+        "compiler": "g++",
+        "language": "C++"
+    },
+    "cpp": {
+        "compiler": "g++",
+        "language": "C++"
+    },
+    "cxx": {
+        "compiler": "g++",
+        "language": "C++"
+    },
+    "C": {
+        "compiler": "g++",
+        "language": "C++"
+    },
+    "c++": { 
+        "compiler": "g++",
+        "language": "C++"
+    }
+}

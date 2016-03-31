@@ -6,6 +6,7 @@ module.exports = global.cli = cli = require 'commander'
 { version } = require '../package'
 logger = require './logger'
 styler = require './styler'
+cleaner = require './cleaner'
 
 ######### - Argument checks and preprocess - ##########
 N_META_ARGUMENTS = 2
@@ -99,7 +100,7 @@ cli
     .description "Remove all executables in the directory"
     .option '-r, --recursive', "Recursively delete executables on all directories"
     .option '-d, --deep', "Also remove oprofile output and all files ending in .out"
-    .action -> console.log "Clean"
+    .action cleaner
 
 cli.help() if cli.notEnoughArguments
 tryToReplaceSecondAlias()

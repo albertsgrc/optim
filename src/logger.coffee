@@ -21,7 +21,7 @@ MINIMUM_COLS = 15
 # Private methods
 getNonOcuppyingLength = (str) -> str.length - stripColor(str).length
 
-tag = (txt, style) -> style(_.padEnd(txt, LEFT_MARGIN)) + TAG_INDICATOR
+tag = (txt, style, tagString) -> style(_.padEnd(txt, LEFT_MARGIN)) + tagString
 
 fold = (string, leftPad = LEFT_PADSTRING_LONG_LINES) ->
     cols = Math.max MINIMUM_COLS, MAX_COLS_PER_LINE - leftPad.length
@@ -49,15 +49,17 @@ fold = (string, leftPad = LEFT_PADSTRING_LONG_LINES) ->
     else
         last
 
-createWriter = (txt, styler, stream = stdout) => (msg, { endline = on, margin = off } = {}) =>
-    msg = inspect msg unless _.isString msg
+createWriter = (txt, styler, { stream = stdout, tagString = TAG_INDICATOR } = {}) =>
+    (msg, { endline = on, margin = off } = {}) =>
+        msg = inspect msg unless _.isString msg
 
-    msg += "\n" if endline is on
-    if margin
-        stream.write "\n " + tag(txt, styler) + fold(msg, LEFT_PADSTRING_LONG_LINES + " ") + "\n"
-    else
-        stream.write tag(txt, styler) + fold(msg)
-    @
+        msg += "\n" if endline is on
+        if margin
+            stream.write "\n " + tag(txt, styler, tagString) +
+            fold(msg, LEFT_PADSTRING_LONG_LINES + " ") + "\n"
+        else
+            stream.write tag(txt, styler, tagString) + fold(msg)
+        @
 
 # Exposed methods
 @write = (str, stream = stdout) => stream.write str; @
@@ -72,6 +74,8 @@ createWriter = (txt, styler, stream = stdout) => (msg, { endline = on, margin = 
         verboseWriter args... if global.cli?.verbose?
         @
 
+@noTag = @n = createWriter "", _.identity, { tagString: _.repeat(" ", TAG_INDICATOR.length) }
+
 @info = @i = createWriter INFO, styler.info
 
 @updateInfo = (msg) => @eraseLine(); @info(msg, endline: off); @
@@ -79,8 +83,11 @@ createWriter = (txt, styler, stream = stdout) => (msg, { endline = on, margin = 
 @warn = @w = createWriter WARN, styler.warn
 
 @error = @e = do ->
-    errorWriter = createWriter ERROR, styler.error, stderr
-    (msg, { margin = off, exit = no, exitCode = 1 } = {}) ->
+    errorWriter = createWriter ERROR, styler.error, { stream: stderr }
+    (msg, { margin = off, exit = no, exitCode = 1, printStack = exit } = {}) ->
+        if printStack
+            stack = (new Error).stack.split("\n")[2..].join("\n")
+            msg = msg + "\n#{_.trimEnd stack, '\n'}"
         ret = errorWriter msg, margin: margin, endline: on
         process.exit exitCode if exit is yes
         ret

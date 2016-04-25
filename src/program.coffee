@@ -51,7 +51,7 @@ module.exports = class Program
     calculateCompilationFlags = (execFile, ext, programIndex, isGuessed) =>
         invalidFlag = (flag) =>
             unless isGuessed
-                logger.e "Invalid compiler flag description #{flag} (#{execFile})", exit: yes
+                logger.e "Invalid compiler flag description #{flag} (#{styler.id execFile})", exit: yes, printStack: no
             else ""
 
         ext = ext[1..].toLowerCase() # Get rid of the dot and put to lowercase

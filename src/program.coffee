@@ -20,9 +20,10 @@ module.exports = class Program
         firstDotIndex = name.indexOf '.'
         if firstDotIndex isnt -1
             extension = name[firstDotIndex...] + extension
-            name = [0...firstDotIndex]
+            name = name[0...firstDotIndex]
 
-        { name: path.join(dir, name), extension, execFileStat: getFileInfo(execFile) }
+        execStat = if utils.isBinaryExecutable execFile then getFileInfo(execFile) else null
+        { name: path.join(dir, name), extension, execFileStat: execStat }
 
     getSrcFileInfo = (programName) ->
         for srcExtension, { compiler, language } of SRC_EXTENSIONS
@@ -47,17 +48,22 @@ module.exports = class Program
 
         (new ListString argsAll, argsProg).toString()
 
-    calculateCompilationFlags = (execFile, ext, programIndex) =>
-        invalidFlag = (flag) ->
-            logger.e "Invalid compiler flag description #{flag} (#{execFile})", exit: yes
+    calculateCompilationFlags = (execFile, ext, programIndex, isGuessed) =>
+        invalidFlag = (flag) =>
+            unless isGuessed
+                logger.e "Invalid compiler flag description #{flag} (#{execFile})", exit: yes
+            else ""
 
         ext = ext[1..].toLowerCase() # Get rid of the dot and put to lowercase
 
         if ext.indexOf('.') isnt -1 # Format name.g.pg.o3
-            flagString = new ListString(
-                for flagName in ext.split('.')
-                    COMPILER_FLAGS[flagName] ? invalidFlag flagName
-            )
+            flags = []
+            for flagName in ext.split('.')
+                if COMPILER_FLAGS[flagName]?
+                    flags.push COMPILER_FLAGS[flagName]
+                else
+                    return invalidFlag flagName
+            flagString = new ListString(flags)
         else # Format name.gpgo3
             initialMatching = _.size(COMPILER_FLAGS)
             currentMatchingFlags = {}
@@ -84,7 +90,7 @@ module.exports = class Program
 
                 if nMatching is 1
                     flagMatching = _.keys(currentMatchingFlags)[0]
-                    invalidFlag ext if flagMatching[i..] isnt ext[i...flagMatching.length]
+                    return invalidFlag ext if flagMatching[i..] isnt ext[i...flagMatching.length]
                     ext = ext[flagMatching.length..]
                     resetInfo()
                     flagString.pushBack(COMPILER_FLAGS[flagMatching])
@@ -94,13 +100,13 @@ module.exports = class Program
                         ext = ext[longestMatchingFlag.length..]
                         resetInfo()
                     else
-                        invalidFlag ext
+                        return invalidFlag ext
 
             if ext.length > 0
                 if longestMatchingFlag?
                     flagString.pushBack(COMPILER_FLAGS[longestMatchingFlag])
                 else
-                    invalidFlag ext
+                    return invalidFlag ext
 
         flagString.pushBack(@flagsByProgram.all ? "",
                             @flagsByProgram[programIndex] ? "")
@@ -133,7 +139,7 @@ module.exports = class Program
         @index = Program.currentIndex++
 
         @arguments = calculateArguments @index
-        @compilationFlags = calculateCompilationFlags @execFile, @execExtension, @index
+        @compilationFlags = calculateCompilationFlags @execFile, @execExtension, @index, @isGuessed
 
         @command = new ListString(@execFile, @arguments).toString()
 

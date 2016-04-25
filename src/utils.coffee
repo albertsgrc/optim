@@ -26,7 +26,8 @@ handleError = (error, {
                         printError = yes # Whether to print the error or not
                       } = {}) ->
     if (error.code? and error.code in allowedErrors) or
-       (error.errno? and error.errno in allowedErrors)
+       (error.errno? and error.errno in allowedErrors) or
+       (error.status? and error.status in allowedErrors)
         return null
 
     errorMsg =
@@ -40,7 +41,8 @@ handleError = (error, {
     exitCode = error.errno ? 1 if exitCode is 0
     process.exit exitCode if exit is yes and
                              not (error.code? and error.code in noExitErrors) and
-                             not (error.errno? and error.errno in noExitErrors)
+                             not (error.errno? and error.errno in noExitErrors) and
+                             not (error.status? and error.status in noExitErrors)
 
     error.toString = -> errorMsg
     error.isError = yes
@@ -131,11 +133,16 @@ handleError = (error, {
 @isBinaryExecutable = (path) =>
     assert _.isString(path), "Argument must be file path (string)"
 
-    fileToolOutput = @attempt(@execSync, "file #{path}").stdout.toLowerCase()
+    res = @attempt(@execSync, "file #{path}", { allowedErrors: [1] })
 
-    fileToolOutput.indexOf('elf') >= 0 and
-    fileToolOutput.indexOf('executable') >= 0 and
-    isExe.sync path
+    unless res?
+        false
+    else
+        fileToolOutput = res.stdout.toLowerCase()
+
+        fileToolOutput.indexOf('elf') >= 0 and
+        fileToolOutput.indexOf('executable') >= 0 and
+        isExe.sync path
 
 @askYesNo = (s) ->
     answer = readLineSync.question("#{s} (y/n) ")

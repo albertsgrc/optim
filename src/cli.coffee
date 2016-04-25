@@ -48,7 +48,7 @@ cli
     .option '-a, --forward-args <[program-specification:]arguments-string>',
         "Forward arguments to the programs"
     .option '-l, --last',
-        "Only check equality with the program with greatest modification time"
+        "Only check equality with the program with latest modification time"
     .action check
 
 # Compile command
@@ -77,7 +77,7 @@ cli
     .option '-a, --forward-args [program-specification:]<arguments-string>',
         "Forward arguments to the programs"
     .option '-l, --last',
-        "Only compute info for the program with greatest modification time"
+        "Only compute info for the program with latest modification time"
     .action -> console.log "Speedup" # TODO: Implement
 
 # Profile command

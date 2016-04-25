@@ -1,6 +1,7 @@
 path = require 'path'
 _ = require 'lodash'
 assert = require 'assert'
+util = require 'util'
 
 Program = require './program'
 { attemptShell } = require './utils'
@@ -8,26 +9,42 @@ Program = require './program'
 module.exports = class ProgramFamily
     @OPTIMIZED_PROGRAMS_SUFFIX: "-opt*"
 
-    guessOthers = ({ name, execExtension, srcExtension }) =>
+    guessOthers = ({ name, execExtension, srcExtension }, last) =>
         executablesPattern = "#{name}#{@OPTIMIZED_PROGRAMS_SUFFIX}#{execExtension}"
-        executables = attemptShell("ls", executablesPattern).sort()
+        executables = attemptShell("ls", executablesPattern)
         sourcesPattern = "#{name}#{@OPTIMIZED_PROGRAMS_SUFFIX}#{srcExtension}"
         sources =
-            for source in attemptShell("ls", sourcesPattern).sort()
+            for source in attemptShell("ls", sourcesPattern)
                 { dir, name } = path.parse source
                 "#{path.join(dir, name)}#{execExtension}"
 
-        for execFile, index in _.union(sources, executables)
-            new Program(execFile, isGuessed: yes)
+        found = _.union(sources, executables).sort()
 
-    constructor: (@original, @others) ->
+
+        programs =
+            for execFile, index in found
+                new Program(execFile, isGuessed: yes)
+
+        if last and programs.length > 0
+            programs = [_.maxBy(programs,
+                (p) ->
+                    stat = if p.hasSrcFile then p.srcFileStat else p.execFileStat
+                    new Date(stat.mtime).getTime()
+            )]
+
+        programs
+
+    constructor: (@original, @others, { last = no } = {}) ->
         @original = new Program(@original) if _.isString @original
 
         assert(@original instanceof Program, "original parameter is not a program nor string")
 
-        @others ?= guessOthers(@original)
+        if @others.length is 0
+            @others = guessOthers(@original, last)
+        else
+            @others[i] = new Program(v) for v, i in @others
 
-        assert(_.isArray(@others), "others must be an array")
+        assert(_.isArray(@others), "others must be an array, instead it was: #{util.inspect @others}")
 
         @all = [@original].concat(@others)
 
@@ -36,7 +53,8 @@ module.exports = class ProgramFamily
 
 
 # Testing code
-
+###
 piFamily = new ProgramFamily("/home/albert/Dropbox/UPC/FIB/6eQuatri/PCA/Lab/sessio3/lab3_session/pi/pi.Fgspg")
 console.log piFamily
 piFamily.compile()
+###

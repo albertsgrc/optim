@@ -18,7 +18,7 @@ cli.notEnoughArguments = process.argv.length <= N_META_ARGUMENTS
 # (Commander only allows one alias per command)
 tryToReplaceSecondAlias = ->
     SECOND_ALIAS =
-        spd: 'speedup', rm: 'clean', eq: 'equal', pf: 'profile'
+        spd: 'speedup', rm: 'clean', cln: 'clean', eq: 'equal', pf: 'profile'
         make: 'compile'
 
     realCommand = SECOND_ALIAS[process.argv[N_META_ARGUMENTS]]

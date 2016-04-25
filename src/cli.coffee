@@ -7,6 +7,7 @@ module.exports = global.cli = cli = require 'commander'
 logger = require './logger'
 styler = require './styler'
 cleaner = require './cleaner'
+{ check } = require './equality-checker'
 
 ######### - Argument checks and preprocess - ##########
 N_META_ARGUMENTS = 2
@@ -28,9 +29,9 @@ checkCommandExists = ->
                 'profile', 'p']
 
     cmd = process.argv[N_META_ARGUMENTS]
-    unless cmd in COMMANDS
+    unless cmd in COMMANDS or cmd[0] is '-'
         logger.e("#{styler.id cmd} is not a optim command. Run #{styler.id 'optim --help'}
-                  for the list of commands", margin: on, exit: yes)
+                  for the list of commands", margin: on, exit: yes, printStack: no)
 
 ######### - CLI command, options and version definitions- ##########
 cli.version version
@@ -47,8 +48,8 @@ cli
     .option '-a, --forward-args <[program-specification:]arguments-string>',
         "Forward arguments to the programs"
     .option '-l, --last',
-        "Only check equality with the program with greatest lexicographic name"
-    .action -> console.log "Equal" # TODO: Implement
+        "Only check equality with the program with greatest modification time"
+    .action check
 
 # Compile command
 cli
@@ -76,7 +77,7 @@ cli
     .option '-a, --forward-args [program-specification:]<arguments-string>',
         "Forward arguments to the programs"
     .option '-l, --last',
-        "Only compute info for the program with greatest lexicographic name"
+        "Only compute info for the program with greatest modification time"
     .action -> console.log "Speedup" # TODO: Implement
 
 # Profile command

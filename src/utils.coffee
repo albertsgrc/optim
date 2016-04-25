@@ -4,6 +4,7 @@ assert = require 'assert'
 _ = require 'lodash'
 { execSync } = require 'child_process'
 isExe = require 'is-executable'
+readLineSync = require 'readline-sync'
 
 logger = require './logger'
 styler = require './styler'
@@ -12,18 +13,21 @@ module.exports = @
 
 shelljs.config.silent = yes
 
-normalizeError = (err) -> err.toString().replace("Error: ", "")
+normalizeError = (err) -> err.toString().replace("Error: ", "")[...-1]
 
 handleError = (error, {
-                        exit = yes, # Whether the process may exit on non-allowed error
+                        exit = yes # Whether the process may exit on non-allowed error
                         allowedErrors = [] # List of allowed error codes,
                                            # returns null immediately if
                                            # error.code is in this array
-                        exitCode = 0,  # if set to 0 defaults to (error.errno ? 1)
+                        noExitErrors = []
+                        exitCode = 0  # if set to 0 defaults to (error.errno ? 1)
                         description = "" # String that will appear before the error text
                         printError = yes # Whether to print the error or not
                       } = {}) ->
-    return null if error.code? and error.code in allowedErrors
+    if (error.code? and error.code in allowedErrors) or
+       (error.errno? and error.errno in allowedErrors)
+        return null
 
     errorMsg =
         if description.length
@@ -34,7 +38,9 @@ handleError = (error, {
     logger.e errorMsg, showStack: no if printError
 
     exitCode = error.errno ? 1 if exitCode is 0
-    process.exit exitCode if exit is yes
+    process.exit exitCode if exit is yes and
+                             not (error.code? and error.code in noExitErrors) and
+                             not (error.errno? and error.errno in noExitErrors)
 
     error.toString = -> errorMsg
     error.isError = yes
@@ -131,6 +137,10 @@ handleError = (error, {
     fileToolOutput.indexOf('executable') >= 0 and
     isExe.sync path
 
+@askYesNo = (s) ->
+    answer = readLineSync.question("#{s} (y/n) ")
+
+    answer in ['y', 'yes', 'yep', 'ye', 'sure', 'si', 'course', 'of course']
 
 
 

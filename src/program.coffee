@@ -1,6 +1,7 @@
 assert = require 'assert'
 _ = require 'lodash'
 path = require 'path'
+utils = require './utils'
 
 { getFileInfo, attempt, execSync, hasLaterModificationTime } = require './utils'
 SRC_EXTENSIONS = require './source-extensions'
@@ -134,15 +135,18 @@ module.exports = class Program
         @arguments = calculateArguments @index
         @compilationFlags = calculateCompilationFlags @execFile, @execExtension, @index
 
+        @command = new ListString(@execFile, @arguments).toString()
+
     compile: (explicitlyDemanded = no) ->
         unless @hasSrcFile or @hasExecFile
             logger.e "Couldn't compile #{styler.id @execFile} because no
                       source file nor executable was found for program",
                      { exit: yes, printStack: no }
 
-        if explicitlyDemanded and not @hasSrcFile
-            logger.w "Couldn't compile #{styler.id @execFile}, which has already an executable,
-                      because no source file was found for the program"
+        unless @hasSrcFile
+            if explicitlyDemanded
+                logger.w "Couldn't compile #{styler.id @execFile}, which has already an executable,
+                          because no source file was found for the program"
             return
 
         unless shouldCompile @
@@ -156,6 +160,18 @@ module.exports = class Program
         { stderr } = attempt execSync, command
 
         logger.n stderr if stderr?.length > 0 # Probably warnings from compiler
+
+    ensureExecutable: ->
+        unless @hasExecFile
+            unless @hasSrcFile
+                logger.e "Program #{styler.id @execFile} doesn't exist or isn't readable"
+            else
+                logger.e "Program #{styler.id @execFile} isn't compiled"
+
+            false
+        else true
+
+
 
 
 # Testing code

@@ -7,14 +7,15 @@ Program = require './program'
 { attemptShell } = require './utils'
 
 module.exports = class ProgramFamily
-    @OPTIMIZED_PROGRAMS_SUFFIX: "-opt*"
+    @OPTIMIZED_PROGRAMS_SUFFIX: "-opt"
 
     guessOthers = ({ name, execExtension, srcExtension }, last) =>
-        executablesPattern = "#{name}#{@OPTIMIZED_PROGRAMS_SUFFIX}#{execExtension}"
-        executables = attemptShell("ls", executablesPattern)
-        sourcesPattern = "#{name}#{@OPTIMIZED_PROGRAMS_SUFFIX}#{srcExtension}"
+        pattern = "^#{name}#{@OPTIMIZED_PROGRAMS_SUFFIX}((?!\\.).)*"
+        executablesPattern = new RegExp(pattern + "#{execExtension.replace(".", "\\.")}$")
+        executables = attemptShell("ls").filter((s) -> s.match(executablesPattern))
+        sourcesPattern = new RegExp(pattern + "#{srcExtension.replace(".", "\\.")}$")
         sources =
-            for source in attemptShell("ls", sourcesPattern)
+            for source in attemptShell("ls").filter((s) -> s.match(sourcesPattern))
                 { dir, name } = path.parse source
                 "#{path.join(dir, name)}#{execExtension}"
 
@@ -39,7 +40,7 @@ module.exports = class ProgramFamily
 
         assert(@original instanceof Program, "original parameter is not a program nor string")
 
-        if @others.length is 0
+        if not @others? or @others.length is 0
             @others = guessOthers(@original, last)
         else
             @others[i] = new Program(v) for v, i in @others

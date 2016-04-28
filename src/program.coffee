@@ -22,6 +22,8 @@ module.exports = class Program
             extension = name[firstDotIndex...] + extension
             name = name[0...firstDotIndex]
 
+        # TODO: Maybe exit and print error if isn't executable??
+
         execStat = if utils.isBinaryExecutable execFile then getFileInfo(execFile) else null
         { name: path.join(dir, name), extension, execFileStat: execStat }
 
@@ -56,18 +58,10 @@ module.exports = class Program
 
         ext = ext[1..].toLowerCase() # Get rid of the dot and put to lowercase
 
-        if ext.indexOf('.') isnt -1 # Format name.g.pg.o3
-            flags = []
-            for flagName in ext.split('.')
-                if COMPILER_FLAGS[flagName]?
-                    flags.push COMPILER_FLAGS[flagName]
-                else
-                    return invalidFlag flagName
-            flagString = new ListString(flags)
-        else # Format name.gpgo3
+        flagString = new ListString()
+        for flagName in ext.split('.')
             initialMatching = _.size(COMPILER_FLAGS)
             currentMatchingFlags = {}
-            flagString = new ListString()
             i = longestMatchingFlag = nMatching = undefined
 
             do resetInfo = ->
@@ -78,8 +72,8 @@ module.exports = class Program
                 i = 0
                 longestMatchingFlag = null
 
-            while i < ext.length
-                for flag of currentMatchingFlags when flag[i] isnt ext[i]
+            while i < flagName.length
+                for flag of currentMatchingFlags when flag[i] isnt flagName[i]
                     delete currentMatchingFlags[flag]
                     --nMatching
 
@@ -90,23 +84,23 @@ module.exports = class Program
 
                 if nMatching is 1
                     flagMatching = _.keys(currentMatchingFlags)[0]
-                    return invalidFlag ext if flagMatching[i..] isnt ext[i...flagMatching.length]
-                    ext = ext[flagMatching.length..]
+                    return invalidFlag flagName if flagMatching[i..] isnt flagName[i...flagMatching.length]
+                    flagName = flagName[flagMatching.length..]
                     resetInfo()
                     flagString.pushBack(COMPILER_FLAGS[flagMatching])
                 else if nMatching is 0
                     if longestMatchingFlag?
                         flagString.pushBack(COMPILER_FLAGS[longestMatchingFlag])
-                        ext = ext[longestMatchingFlag.length..]
+                        flagName = flagName[longestMatchingFlag.length..]
                         resetInfo()
                     else
-                        return invalidFlag ext
+                        return invalidFlag flagName
 
-            if ext.length > 0
+            if flagName.length > 0
                 if longestMatchingFlag?
                     flagString.pushBack(COMPILER_FLAGS[longestMatchingFlag])
                 else
-                    return invalidFlag ext
+                    return invalidFlag flagName
 
         flagString.pushBack(@flagsByProgram.all ? "",
                             @flagsByProgram[programIndex] ? "")
@@ -182,7 +176,7 @@ module.exports = class Program
 
 # Testing code
 ###
-timer = new Program "/home/albert/Dropbox/UPC/FIB/6eQuatri/PCA/Lab/sessio3/lab3_session/pi/pi.3gStaTicPg"
+timer = new Program "/home/albert/Dropbox/UPC/FIB/6eQuatri/PCA/Lab/sessio3/lab3_session/pi/pi.3g.StaTic.Pg"
 console.log timer
 timer = new Program "/home/albert/Dropbox/UPC/FIB/6eQuatri/PCA/Lab/sessio3/lab3_session/pi/pi.3gspg"
 console.log timer

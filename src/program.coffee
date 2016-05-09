@@ -1,9 +1,8 @@
-assert = require 'assert'
 _ = require 'lodash'
 path = require 'path'
-utils = require './utils'
+assert = require 'assert'
 
-{ getFileInfo, attempt, execSync, hasLaterModificationTime } = require './utils'
+{ getFileInfo, attempt, execSync, hasLaterModificationTime, isBinaryExecutable } = require './utils'
 SRC_EXTENSIONS = require './source-extensions'
 ListString = require './list-string'
 logger = require './logger'
@@ -24,7 +23,7 @@ module.exports = class Program
 
         # TODO: Maybe exit and print error if isn't executable??
 
-        execStat = if utils.isBinaryExecutable execFile then getFileInfo(execFile) else null
+        execStat = if isBinaryExecutable execFile then getFileInfo(execFile) else null
         { name: path.join(dir, name), extension, execFileStat: execStat }
 
     getSrcFileInfo = (programName) ->
@@ -35,14 +34,31 @@ module.exports = class Program
 
         {}
 
-    addHelper = (where, what, who = 'all') ->
-        assert(_.isString(who) or _.isLength(who),
-               "Argument who must be a string or positive integer")
+    addHelper = (where, argspec) ->
+        assert(_.isString(argspec), "Argument argspec must be a string")
 
-        if where[who]?
-            where[who].pushBack what
+        info = argspec.split ":"
+
+        add = (who, what) ->
+            if where[who]?
+                where[who].pushBack what
+            else
+                where[who] = new ListString(what)
+
+        if info.length is 1
+            add 'all', argspec
         else
-            where[who] = new ListString(what)
+            [specificationStr, what] = info
+
+            if specificationStr.length is 0 or 'all' in specification = specificationStr.split ","
+                add 'all', what
+            else
+                for program in _.uniq specification
+                    if isNaN(program) or not _.isLength(Number(program))
+                        logger.w "#{program} is not a valid program specifier, should be natural number, ignoring..."
+                    else
+                        add program, what
+
 
     calculateArguments = (programIndex) =>
         argsAll = @argumentsByProgram.all ? ""

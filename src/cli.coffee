@@ -8,6 +8,7 @@ logger = require './logger'
 styler = require './styler'
 cleaner = require './cleaner'
 { check } = require './equality-checker'
+Program = require './program'
 
 ######### - Argument checks and preprocess - ##########
 N_META_ARGUMENTS = 2
@@ -46,7 +47,7 @@ cli
     .alias 'e'
     .description 'Check equality of stdout output to verify correctness'
     .option '-a, --forward-args <[program-specification:]arguments-string>',
-        "Forward arguments to the programs"
+        "Forward arguments to the programs", Program.addArguments
     .option '-l, --last',
         "Only check equality with the program with latest modification time"
     .action check
@@ -57,7 +58,7 @@ cli
     .alias 'c'
     .description "Compile the given programs"
     .option '-f, --flags [program-specification:]<flags-string>',
-        "Indicate flags to forward to the compilation of programs"
+        "Indicate flags to forward to the compilation of programs", Program.addFlags
     .option '-a, --all', 'Compile all matching programs in lexicographic order'
     .action -> console.log "Compile" # TODO: Implement
 
@@ -75,7 +76,7 @@ cli
     .option '-c, --confidence-rate <rate>',
         "Confidence rate for the T-Student test"
     .option '-a, --forward-args [program-specification:]<arguments-string>',
-        "Forward arguments to the programs"
+        "Forward arguments to the programs", Program.addArguments
     .option '-l, --last',
         "Only compute info for the program with latest modification time"
     .action -> console.log "Speedup" # TODO: Implement

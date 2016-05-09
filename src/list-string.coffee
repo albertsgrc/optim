@@ -15,9 +15,11 @@ module.exports = class ListString
                     @string = elem
                 else
                     @string = how(@string, elem)
+            else if elem instanceof ListString
+                @string = how @string, elem.string
             else
                 assert(false,
-                    "Option should be either a string or an array of strings")
+                    "Option should be either a string, an array of strings or a ListString")
 
     constructor: (elems...) -> @pushBack elems...
 

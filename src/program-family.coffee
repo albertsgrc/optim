@@ -10,17 +10,16 @@ module.exports = class ProgramFamily
     @OPTIMIZED_PROGRAMS_SUFFIX: "-opt"
 
     guessOthers = ({ name, execExtension, srcExtension }, last) =>
-        pattern = "^#{name}#{@OPTIMIZED_PROGRAMS_SUFFIX}((?!\\.).)*"
-        executablesPattern = new RegExp(pattern + "#{execExtension.replace(".", "\\.")}$")
+        pattern = "^#{name}#{@OPTIMIZED_PROGRAMS_SUFFIX}[^.]*\\."
+        executablesPattern = new RegExp(pattern + "#{execExtension}$")
         executables = attemptShell("ls").filter((s) -> s.match(executablesPattern))
-        sourcesPattern = new RegExp(pattern + "#{srcExtension.replace(".", "\\.")}$")
+        sourcesPattern = new RegExp(pattern + "#{srcExtension}$")
         sources =
             for source in attemptShell("ls").filter((s) -> s.match(sourcesPattern))
                 { dir, name } = path.parse source
                 "#{path.join(dir, name)}#{execExtension}"
 
         found = _.union(sources, executables).sort()
-
 
         programs =
             for execFile, index in found
@@ -35,12 +34,12 @@ module.exports = class ProgramFamily
 
         programs
 
-    constructor: (@original, @others, { last = no } = {}) ->
+    constructor: (@original, @others = [], { last = no, shouldGuess = yes } = {}) ->
         @original = new Program(@original) if _.isString @original
 
         assert(@original instanceof Program, "original parameter is not a program nor string")
 
-        if not @others? or @others.length is 0
+        if shouldGuess and @others.length is 0
             @others = guessOthers(@original, last)
         else
             @others[i] = new Program(v) for v, i in @others

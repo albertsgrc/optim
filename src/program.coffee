@@ -18,7 +18,7 @@ module.exports = class Program
         # 'name.ext1', but we need name to be 'name' and ext to be '.ext1.ext2'
         firstDotIndex = name.indexOf '.'
         if firstDotIndex isnt -1
-            extension = name[firstDotIndex...] + extension
+            extension = name[firstDotIndex+1...] + extension
             name = name[0...firstDotIndex]
 
         # TODO: Maybe exit and print error if isn't executable??

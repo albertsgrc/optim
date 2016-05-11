@@ -184,8 +184,7 @@ module.exports = class Program
             else
                 logger.e "Program #{styler.id @execFile} isn't compiled"
 
-            false
-        else true
+        @hasExecFile
 
 
 

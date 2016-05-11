@@ -8,6 +8,7 @@ logger = require './logger'
 styler = require './styler'
 cleaner = require './cleaner'
 { check } = require './equality-checker'
+{ compile } = require './compiler'
 Program = require './program'
 
 ######### - Argument checks and preprocess - ##########
@@ -42,6 +43,7 @@ cli
     .option '-v, --verbose', "Show verbose output"
 
 # Equal command
+# TODO: Should add support for specifying input/output files
 cli
     .command 'equal <original-program> [others...]'
     .alias 'e'
@@ -59,8 +61,9 @@ cli
     .description "Compile the given programs"
     .option '-f, --flags [program-specification:]<flags-string>',
         "Indicate flags to forward to the compilation of programs", Program.addFlags
-    .option '-a, --all', 'Compile all matching programs in lexicographic order'
-    .action -> console.log "Compile" # TODO: Implement
+    .option '-s, --single', 'Only compile the given program. Otherwise, similar
+                             programs are searched and compiled in lexicographic order'
+    .action compile
 
 # Speedup command
 cli

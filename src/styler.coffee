@@ -18,6 +18,16 @@ styles256 =
     normal: chalk("#f1c40f")
     bad: chalk("#9b59b6")
 
+    superNice: chalk("#00afff").bgBlack
+    veryGood: chalk("#00ffff").bgBlack
+    nice: chalk("#00ffd7").bgBlack
+    good: chalk("#5fff87").bgBlack
+    ok: chalk("#87ff00").bgBlack
+    regular: chalk("#ffff00").bgBlack
+    insuficient: chalk("#ff8700").bgBlack
+    veryBad: chalk("#ff005f").bgBlack
+
+
 styles16 =
     error: chalk.red
     warn: chalk.yellow
@@ -31,6 +41,15 @@ styles16 =
     okay: chalk.green
     normal: chalk.white
     bad: chalk.yellow
+
+    superNice: chalk.blue.bgBlack
+    veryGood: chalk.blue.bgBlack
+    nice: chalk.cyan.bgBlack
+    good: chalk.green.bgBlack
+    ok: chalk.green.bgBlack
+    regular: chalk.yellow.bgBlack
+    insuficient: chalk.red.bgBlack
+    veryBad: chalk.red.bgBlack
 
 # SANITY-CHECKS
 assert(Object.keys(styles256).length is Object.keys(styles16).length,

@@ -25,7 +25,7 @@ module.exports = class ProgramTiming
         logger.e("Time limit argument must be > 0", { exit: yes, printStack: no }) if @timeLimit <= 0
 
     _timeExec: (i) ->
-        result = attempt execSync, "#{TIMER_CMD} #{@program.command}"
+        result = attempt execSync, "#{TIMER_CMD} #{@program.command}", { exit: no, printError: no }
 
         if result.isError
             logger.write(styler.error("error:") + " #{result.stderr?[...-1]}").endLine()

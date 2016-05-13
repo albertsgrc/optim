@@ -184,7 +184,7 @@ module.exports = class Program
     time: -> @timing = new ProgramTiming(@)
 
     ensureExecutable: ->
-        unless @hasExecFile
+        unless @isGuessed or @hasExecFile
             unless @hasSrcFile
                 logger.e "Program #{styler.id @execFile} doesn't exist or isn't readable"
             else

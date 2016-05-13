@@ -90,6 +90,8 @@ prettySpeedup = (speedup) ->
                                       { value: "#{styler.value originalTiming.repetitions}", space: 11 })
 
     for program in programs.others
+        continue unless program.ensureExecutable()
+
         timing = program.time()
 
         continue unless timing?

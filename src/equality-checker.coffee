@@ -6,30 +6,28 @@ ProgramFamily = require './program-family'
 styler = require './styler'
 logger = require './logger'
 
-module.exports = @
-
 @check = (original, others, { last = no } = {}) ->
-    programFamily = new ProgramFamily original, others, { last }
+    programs = new ProgramFamily original, others, { last }
 
     # Check that all programs are executable
 
-    return unless programFamily.original.ensureExecutable()
+    return unless programs.original.ensureExecutable()
 
-    unless programFamily.others.length > 0
+    unless programs.others.length > 0
         logger.w("No program was found to compare with #{styler.id original}")
         process.exit 0
 
     outputFileOriginal = uniqueFilename os.tmpDir()
 
-    logger.i "Executing original program #{styler.id programFamily.original.command}..."
+    logger.i "Executing original program #{styler.id programs.original.toString()}..."
 
-    attempt execSync, "#{programFamily.original.command} > #{outputFileOriginal}"
-    for program in programFamily.others
+    attempt execSync, "#{programs.original.command} > #{outputFileOriginal}"
+    for program in programs.others
         continue unless program.ensureExecutable()
 
         outputFile = uniqueFilename os.tmpDir()
 
-        logger.i "Checking #{styler.id program.command}... ", endline: no
+        logger.i "Checking #{styler.id program.toString()}... ", endline: no
 
         res = attempt execSync, "#{program.command} > #{outputFile}",
                       { exit: no, printError: no }

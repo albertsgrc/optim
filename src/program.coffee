@@ -7,12 +7,14 @@ SRC_EXTENSIONS = require './source-extensions'
 ListString = require './list-string'
 logger = require './logger'
 styler = require './styler'
+ProgramTiming = require './program-timing'
 
 COMPILER_FLAGS = require './compiler-flags'
 
 module.exports = class Program
     getExecFileInfo = (execFile) ->
         { dir, name, ext: extension } = path.parse execFile
+        extension = extension[1..] # Remove dot
 
         # If file is name.ext1.ext2 then the parsed ext is '.ext1' and name is
         # 'name.ext1', but we need name to be 'name' and ext to be '.ext1.ext2'
@@ -138,7 +140,7 @@ module.exports = class Program
 
     @addFlags: _.partial(addHelper, Program.flagsByProgram)
 
-    constructor: (@execFile, { @isGuessed = no } = {}) ->
+    constructor: (@execFile, { @isGuessed = no, @isOriginal = no } = {}) ->
         assert _.isString(@execFile), "Executable file is not a String"
 
         { @name, extension: @execExtension, @execFileStat } = getExecFileInfo @execFile
@@ -177,6 +179,10 @@ module.exports = class Program
 
         logger.n stderr if stderr?.length > 0 # Probably warnings from compiler
 
+        @hasExecFile = yes
+
+    time: -> @timing = new ProgramTiming(@)
+
     ensureExecutable: ->
         unless @hasExecFile
             unless @hasSrcFile
@@ -185,6 +191,8 @@ module.exports = class Program
                 logger.e "Program #{styler.id @execFile} isn't compiled"
 
         @hasExecFile
+
+    toString: -> @command
 
 
 

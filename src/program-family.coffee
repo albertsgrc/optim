@@ -10,16 +10,18 @@ module.exports = class ProgramFamily
     @OPTIMIZED_PROGRAMS_SUFFIX: "-opt"
 
     guessOthers = ({ name, execExtension, srcExtension }, last) =>
-        pattern = "^#{name}#{@OPTIMIZED_PROGRAMS_SUFFIX}[^.]*\\."
+        { dir, base } = path.parse name
+        pattern = "^#{base}#{@OPTIMIZED_PROGRAMS_SUFFIX}[^.]*\\."
         executablesPattern = new RegExp(pattern + "#{execExtension}$")
-        executables = attemptShell("ls").filter((s) -> s.match(executablesPattern))
+        executables = attemptShell("ls", "#{dir}").filter((s) -> s.match(executablesPattern))
         sourcesPattern = new RegExp(pattern + "#{srcExtension}$")
         sources =
-            for source in attemptShell("ls").filter((s) -> s.match(sourcesPattern))
-                { dir, name } = path.parse source
-                "#{path.join(dir, name)}#{execExtension}"
+            for source in attemptShell("ls",  "#{dir}").filter((s) -> s.match(sourcesPattern))
+                { dir2, name } = path.parse source
+                dir2 ?= "./"
+                "#{path.join(dir2, name)}.#{execExtension}"
 
-        found = _.union(sources, executables).sort()
+        found = _.union(sources, executables).sort().map((s) -> path.join(dir, s))
 
         programs =
             for execFile, index in found
@@ -35,7 +37,7 @@ module.exports = class ProgramFamily
         programs
 
     constructor: (@original, @others = [], { last = no, shouldGuess = yes } = {}) ->
-        @original = new Program(@original) if _.isString @original
+        @original = new Program(@original, { isOriginal: yes }) if _.isString @original
 
         assert(@original instanceof Program, "original parameter is not a program nor string")
 

@@ -6,9 +6,10 @@ module.exports = global.cli = cli = require 'commander'
 { version } = require '../package'
 logger = require './logger'
 styler = require './styler'
-cleaner = require './cleaner'
+{ clean } = require './cleaner'
 { check } = require './equality-checker'
 { compile } = require './compiler'
+{ time } = require './timer'
 Program = require './program'
 
 ######### - Argument checks and preprocess - ##########
@@ -20,14 +21,14 @@ cli.notEnoughArguments = process.argv.length <= N_META_ARGUMENTS
 # (Commander only allows one alias per command)
 tryToReplaceSecondAlias = ->
     SECOND_ALIAS =
-        spd: 'speedup', rm: 'clean', cln: 'clean', eq: 'equal', pf: 'profile'
+        spd: 'time', speedup: 'time', s: 'time', rm: 'clean', cln: 'clean', eq: 'equal', pf: 'profile'
         make: 'compile'
 
     realCommand = SECOND_ALIAS[process.argv[N_META_ARGUMENTS]]
     process.argv[N_META_ARGUMENTS] = realCommand if realCommand?
 
 checkCommandExists = ->
-    COMMANDS = ['speedup', 's', 'clean', 'C', 'equal', 'e', 'compile', 'c',
+    COMMANDS = ['time', 't', 'clean', 'C', 'equal', 'e', 'compile', 'c',
                 'profile', 'p']
 
     cmd = process.argv[N_META_ARGUMENTS]
@@ -55,6 +56,7 @@ cli
     .action check
 
 # Compile command
+# TODO: More complex compilation support with Makefiles and local/global configuration files
 cli
     .command 'compile <program> [others...]'
     .alias 'c'
@@ -66,14 +68,15 @@ cli
     .action compile
 
 # Speedup command
+# TODO: Automatic latex graph generation
 cli
-    .command 'speedup <original-program> [others...]'
-    .alias 's'
+    .command 'time <original-program> [others...]'
+    .alias 't'
     .description "Compute speedups, execution times and t-student test"
     .option '-r, --repetitions <repetitions>',
         "Maximum program executions to average speedup for each of them."
-    .option '-f, --force-steps',
-        "Force to execute all steps independently of time limit"
+    .option '-f, --force-repetitions',
+        "Force to execute all repetitions independently of time limit"
     .option '-t, --time-limit <time_in_seconds>',
         "Time limit for all repetitions of a single program time check."
     .option '-c, --confidence-rate <rate>',
@@ -82,7 +85,7 @@ cli
         "Forward arguments to the programs", Program.addArguments
     .option '-l, --last',
         "Only compute info for the program with latest modification time"
-    .action -> console.log "Speedup" # TODO: Implement
+    .action time
 
 # Profile command
 cli
@@ -105,7 +108,9 @@ cli
     .description "Remove all executables in the directory"
     .option '-r, --recursive', "Recursively delete executables on all directories"
     .option '-d, --deep', "Also remove oprofile output and all files ending in .out"
-    .action cleaner
+    .action clean
+
+# TODO: Macro creation command
 
 cli.help() if cli.notEnoughArguments
 tryToReplaceSecondAlias()

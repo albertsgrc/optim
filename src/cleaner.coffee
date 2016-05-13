@@ -3,7 +3,7 @@ logger = require './logger'
 styler = require './styler'
 _ = require 'lodash'
 
-module.exports = ({ recursive = no, deep = no } = {}) ->
+@clean = ({ recursive = no, deep = no } = {}) ->
     hasFileTool = attemptShell('which', 'file')?
 
     unless hasFileTool

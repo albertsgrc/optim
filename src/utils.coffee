@@ -5,13 +5,14 @@ _ = require 'lodash'
 { execSync } = require 'child_process'
 isExe = require 'is-executable'
 readLineSync = require 'readline-sync'
+{ stripColor } = require 'chalk'
 
 logger = require './logger'
 styler = require './styler'
 
-module.exports = @
-
 shelljs.config.silent = yes
+
+DFL_DECIMAL_PLACES = 3
 
 normalizeError = (err) -> err.toString().replace("Error: ", "")[...-1]
 
@@ -149,7 +150,23 @@ handleError = (error, {
 
     answer in ['y', 'yes', 'yep', 'ye', 'sure', 'si', 'course', 'of course']
 
+@prettyDecimal = (value, { decimal_places = DFL_DECIMAL_PLACES } = {}) ->
+    rounder = Math.pow 10, decimal_places
+    Math.round(value*rounder)/rounder
 
+@getNonOcuppyingLength = (str) -> str.length - stripColor(str).length
+
+COMPARTMENT_SEPARATOR = " | "
+
+@compartimentedString = (values...) =>
+    string = ""
+    for { value, space, padKind = "End" }, i in values
+        string += COMPARTMENT_SEPARATOR if i > 0 and values[i-1].value.length > 0
+        padding = space + @getNonOcuppyingLength(value)
+        padding += COMPARTMENT_SEPARATOR.length if value.length is 0
+        string += _['pad' + padKind](value, padding)
+
+    string
 
 # Testing Code
 ###

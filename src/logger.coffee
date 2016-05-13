@@ -1,11 +1,9 @@
 _ = require 'lodash'
 { clearLine, cursorTo } = require 'readline'
-{ stripColor } = require 'chalk'
 { inspect } = require 'util'
 
+{ getNonOcuppyingLength } = require './utils'
 styler = require './styler'
-
-module.exports = @
 
 # Alias
 { stdout, stderr } = process
@@ -19,7 +17,6 @@ MAX_COLS_PER_LINE = stdout.columns - 1
 MINIMUM_COLS = 15
 
 # Private methods
-getNonOcuppyingLength = (str) -> str.length - stripColor(str).length
 
 tag = (txt, style, tagString) -> style(_.padEnd(txt, LEFT_MARGIN)) + tagString
 
@@ -64,7 +61,7 @@ createWriter = (txt, styler, { stream = stdout, tagString = TAG_INDICATOR } = {}
 # Exposed methods
 @write = (str, stream = stdout) => stream.write str; @
 
-@endLine = (stream = stdout) => stream.write "\n"; @
+@endLine = (stream = stdout) => stream.write "\n"; @openUpdate = no; @
 
 @eraseLine = (stream = stdout) => clearLine(stream); cursorTo(stream, 0); @
 

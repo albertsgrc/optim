@@ -14,9 +14,12 @@ module.exports = class ListString
                 if @string.length is 0
                     @string = elem
                 else
-                    @string = how(@string, elem)
+                    @string = how @string, elem
             else if elem instanceof ListString
-                @string = how @string, elem.string
+                if @string.length is 0
+                    @string = elem.string
+                else
+                    @string = how @string, elem.string
             else
                 assert(false,
                     "Option should be either a string, an array of strings or a ListString")

@@ -28,7 +28,7 @@ module.exports = class ProgramTiming
         result = attempt execSync, "#{TIMER_CMD} #{@program.command}", { exit: no, printError: no }
 
         if result.isError
-            logger.write(styler.error("error:") + " #{result.stderr?[...-1]}").endLine()
+            logger.write(styler.error(" ERROR:") + " #{result.stderr?[...-1]}").endLine()
             process.exit 1 if @program.isOriginal
             return false
 
@@ -55,8 +55,8 @@ module.exports = class ProgramTiming
         @repetitions = if ProgramTiming.forceRepetitions then ProgramTiming.repetitions else null
 
         @_updateProgress 1
-        success = @_timeExec(1)
-        return null unless success
+        @success = @_timeExec(1)
+        return null unless @success
 
         @repetitions ?= Math.max 1, Math.min(ProgramTiming.repetitions, (ProgramTiming.timeLimit*1e6//@elapsed))
 
@@ -64,8 +64,8 @@ module.exports = class ProgramTiming
 
         for i in [2...@repetitions+1]
             @_updateProgress i
-            success = @_timeExec(i)
-            return null unless success
+            @success = @_timeExec(i)
+            return null unless @success
 
         if @repetitions <= 1
             @[stat + 'Variance'] = 0 for stat in ProgramTiming.stats

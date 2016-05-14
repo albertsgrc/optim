@@ -43,7 +43,7 @@ logger = require './logger'
             else # equal
                 logger.write(styler.okay("okay")).endLine()
         else # Error while executing the program
-            logger.write(styler.error("error:") + " #{res.stderr?[...-1]}").endLine()
+            logger.write(styler.error(" ERROR:") + " #{res.stderr?[...-1]}").endLine()
 
         attemptShell 'rm', outputFile
 

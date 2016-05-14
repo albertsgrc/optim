@@ -94,7 +94,7 @@ prettySpeedup = (speedup) ->
 
         timing = program.time()
 
-        continue unless timing?
+        continue unless timing.success
 
         isFasterThanOriginal = isFaster timing, originalTiming, confidenceRate
         speedup = originalTiming.cpu/timing.cpu

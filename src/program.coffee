@@ -12,6 +12,9 @@ ProgramTiming = require './program-timing'
 
 COMPILER_FLAGS = require './compiler-flags'
 
+# TODO: Add support for symlinks as possible executable pointers (Maybe resolve symlink before evaluation?)
+# TODO: Add support for arbitrary extensions (just ignore when found)
+
 module.exports = class Program
     getExecFileInfo = (execFile) ->
         { dir, name, ext: extension } = path.parse execFile

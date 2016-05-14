@@ -9,6 +9,7 @@ styler = require './styler'
 
 DFL_CONFIDENCE_RATE = 0.05
 DECIMALS = 3
+SPACES_BY_COL = [10, Math.max(7, 2 + DECIMALS), 3 + DECIMALS, Math.max(6, 4 + DECIMALS), 11]
 
 isFaster = ({ cpu: meanOpt,  repetitions: repsOpt,  cpuVariance: varianceOpt },
             { cpu: meanOriginal, repetitions: repsOriginal, cpuVariance: varianceOriginal}, confidence) ->
@@ -75,19 +76,19 @@ prettySpeedup = (speedup) ->
 
     return unless programs.original.ensureExecutable()
 
-    logger.noTag compartimentedString({ value: chalk.bold("Is faster?"),  space: 10 },
-                                      { value: chalk.bold("Speedup"),     space: Math.max(7, 2 + DECIMALS) },
-                                      { value: chalk.bold("CPU"),         space: 3 + DECIMALS },
-                                      { value: chalk.bold("Memory"),      space: Math.max(6, 4 + DECIMALS) },
-                                      { value: chalk.bold("Repetitions"), space: 11 })
+    logger.noTag compartimentedString({ value: chalk.bold("Is faster?"),  space: SPACES_BY_COL[0] },
+                                      { value: chalk.bold("Speedup"),     space: SPACES_BY_COL[1] },
+                                      { value: chalk.bold("CPU"),         space: SPACES_BY_COL[2] },
+                                      { value: chalk.bold("Memory"),      space: SPACES_BY_COL[3] },
+                                      { value: chalk.bold("Repetitions"), space: SPACES_BY_COL[4] })
 
     originalTiming = programs.original.time()
 
-    logger.noTag compartimentedString({ value: "", space: 10 },
-                                      { value: "", space: Math.max(7, 2 + DECIMALS) },
-                                      { value: "#{styler.value(toSecs(originalTiming.cpu))}s", space: 3 + DECIMALS },
-                                      { value: "#{prettyMemory originalTiming.mem_max}", space: Math.max(6, 4 + DECIMALS) },
-                                      { value: "#{styler.value originalTiming.repetitions}", space: 11 })
+    logger.noTag compartimentedString({ value: "", space: SPACES_BY_COL[0] },
+                                      { value: "", space: SPACES_BY_COL[1] },
+                                      { value: "#{styler.value(toSecs(originalTiming.cpu))}s", space: SPACES_BY_COL[2] },
+                                      { value: "#{prettyMemory originalTiming.mem_max}", space: SPACES_BY_COL[3] },
+                                      { value: "#{styler.value originalTiming.repetitions}", space: SPACES_BY_COL[4] })
 
     for program in programs.others
         continue unless program.ensureExecutable()
@@ -108,8 +109,8 @@ prettySpeedup = (speedup) ->
             else
                 styler.normal('UNKNOWN')
 
-        logger.noTag compartimentedString({ value: chalk.bold(fasterString), space: 10, padKind: "Start" },
-                                          { value: "#{prettySpeedup speedup}", space: Math.max(7, 2 + DECIMALS) },
-                                          { value: "#{styler.value(toSecs(timing.cpu))}s", space: 3 + DECIMALS },
-                                          { value: "#{prettyMemory timing.mem_max}", space: Math.max(6, 4 + DECIMALS) },
-                                          { value: "#{styler.value timing.repetitions}", space: 11 })
+        logger.noTag compartimentedString({ value: chalk.bold(fasterString), space: SPACES_BY_COL[0], padKind: "Start" },
+                                          { value: "#{prettySpeedup speedup}", space: SPACES_BY_COL[1] },
+                                          { value: "#{styler.value(toSecs(timing.cpu))}s", space: SPACES_BY_COL[2] },
+                                          { value: "#{prettyMemory timing.mem_max}", space: SPACES_BY_COL[3] },
+                                          { value: "#{styler.value timing.repetitions}", space: SPACES_BY_COL[4] })

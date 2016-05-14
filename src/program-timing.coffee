@@ -52,7 +52,11 @@ module.exports = class ProgramTiming
         @_m2 = {}
         @[stat] = @[stat + 'Variance'] = @_m2[stat] = 0 for stat in ProgramTiming.stats
 
-        @repetitions = if ProgramTiming.forceRepetitions then ProgramTiming.repetitions else null
+        @repetitions =
+            if ProgramTiming.forceRepetitions or ProgramTiming.repetitions is 1
+                ProgramTiming.repetitions
+            else
+                null
 
         @_updateProgress 1
         @success = @_timeExec(1)

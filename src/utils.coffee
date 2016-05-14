@@ -131,6 +131,11 @@ handleError = (error, {
     process.stderr.write = previousStderr
     { stderr, stdout: result }
 
+@isExecutable = (path) =>
+    assert _.isString(path), "Argument must be file path (string)"
+    isExe.sync path
+
+
 @isBinaryExecutable = (path) =>
     assert _.isString(path), "Argument must be file path (string)"
 

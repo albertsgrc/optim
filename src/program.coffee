@@ -3,7 +3,7 @@ path = require 'path'
 assert = require 'assert'
 hasbin = require 'hasbin'
 
-{ getFileInfo, attempt, execSync, hasLaterModificationTime, isBinaryExecutable } = require './utils'
+{ getFileInfo, attempt, execSync, hasLaterModificationTime, isExecutable } = require './utils'
 SRC_EXTENSIONS = require './source-extensions'
 ListString = require './list-string'
 logger = require './logger'
@@ -11,9 +11,6 @@ styler = require './styler'
 ProgramTiming = require './program-timing'
 
 COMPILER_FLAGS = require './compiler-flags'
-
-# TODO: Add support for symlinks as possible executable pointers (Maybe resolve symlink before evaluation?)
-# TODO: Add support for arbitrary extensions (just ignore when found)
 
 module.exports = class Program
     getExecFileInfo = (execFile) ->
@@ -29,7 +26,7 @@ module.exports = class Program
 
         # TODO: Maybe exit and print error if isn't executable??
 
-        execStat = if isBinaryExecutable execFile then getFileInfo(execFile) else null
+        execStat = if isExecutable execFile then getFileInfo(execFile) else null
         { name: path.join(dir, name), extension, execFileStat: execStat }
 
     getSrcFileInfo = (programName) ->
@@ -75,16 +72,17 @@ module.exports = class Program
     calculateCompilationFlags = (execFile, ext, programIndex, isGuessed) =>
         invalidFlag = (flag) =>
             unless isGuessed
-                logger.e "Invalid compiler flag description #{flag} (#{styler.id execFile})", exit: yes, printStack: no
+                logger.w "Ignoring flag description #{flag} (#{styler.id execFile})..."
             else ""
 
-        ext = ext[1..].toLowerCase() # Get rid of the dot and put to lowercase
+        ext = ext.toLowerCase() # Get rid of the dot and put to lowercase
 
         flagString = new ListString()
         for flagName in ext.split('.')
             initialMatching = _.size(COMPILER_FLAGS)
             currentMatchingFlags = {}
             i = longestMatchingFlag = nMatching = undefined
+            valid = true
 
             do resetInfo = ->
                 # Create matching flags set, initially all flags match
@@ -93,6 +91,9 @@ module.exports = class Program
                 nMatching = initialMatching
                 i = 0
                 longestMatchingFlag = null
+
+            original = flagName
+            currFlagString = new ListString()
 
             while i < flagName.length
                 for flag of currentMatchingFlags when flag[i] isnt flagName[i]
@@ -106,23 +107,32 @@ module.exports = class Program
 
                 if nMatching is 1
                     flagMatching = _.keys(currentMatchingFlags)[0]
-                    return invalidFlag flagName if flagMatching[i..] isnt flagName[i...flagMatching.length]
+                    if flagMatching[i..] isnt flagName[i...flagMatching.length]
+                        invalidFlag original
+                        valid = false
+                        break
                     flagName = flagName[flagMatching.length..]
                     resetInfo()
-                    flagString.pushBack(COMPILER_FLAGS[flagMatching])
+                    currFlagString.pushBack(COMPILER_FLAGS[flagMatching])
                 else if nMatching is 0
                     if longestMatchingFlag?
-                        flagString.pushBack(COMPILER_FLAGS[longestMatchingFlag])
+                        currFlagString.pushBack(COMPILER_FLAGS[longestMatchingFlag])
                         flagName = flagName[longestMatchingFlag.length..]
                         resetInfo()
                     else
-                        return invalidFlag flagName
+                        invalidFlag original
+                        valid = false
+                        break
 
-            if flagName.length > 0
+            if flagName.length > 0 and valid
                 if longestMatchingFlag?
-                    flagString.pushBack(COMPILER_FLAGS[longestMatchingFlag])
+                    currFlagString.pushBack(COMPILER_FLAGS[longestMatchingFlag])
                 else
-                    return invalidFlag flagName
+                    invalidFlag original
+                    valid = false
+
+            if valid
+                flagString.pushBack(currFlagString)
 
         flagString.pushBack(@flagsByProgram.all ? "",
                             @flagsByProgram[programIndex] ? "")

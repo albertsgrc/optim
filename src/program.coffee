@@ -201,7 +201,7 @@ module.exports = class Program
     ensureExecutable: ->
         unless @isGuessed or @hasExecFile or @hasBinaryInPath
             unless @hasSrcFile
-                logger.e "Program #{styler.id @execFile} doesn't exist or isn't readable"
+                logger.e "Program #{styler.id @execFile} doesn't exist or isn't executable"
             else
                 logger.e "Program #{styler.id @execFile} isn't compiled"
 

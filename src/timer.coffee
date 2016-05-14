@@ -9,7 +9,7 @@ styler = require './styler'
 
 DFL_CONFIDENCE_RATE = 0.05
 DECIMALS = 3
-SPACES_BY_COL = [10, Math.max(7, 2 + DECIMALS), 3 + DECIMALS, Math.max(6, 4 + DECIMALS), 11]
+SPACES_BY_COL = [10, Math.max(7, 5 + DECIMALS), 6 + DECIMALS, Math.max(6, 6 + DECIMALS), 11]
 
 isFaster = ({ cpu: meanOpt,  repetitions: repsOpt,  cpuVariance: varianceOpt },
             { cpu: meanOriginal, repetitions: repsOriginal, cpuVariance: varianceOriginal}, confidence) ->

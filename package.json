@@ -29,6 +29,7 @@
     "chalk256": "^5.1.0",
     "commander": "^2.9.0",
     "distributions": "^0.2.1",
+    "hasbin": "^1.2.2",
     "is-executable": "^1.0.1",
     "lodash": "^4.6.1",
     "readline-sync": "^1.4.1",

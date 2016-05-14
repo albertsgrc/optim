@@ -1,6 +1,7 @@
 _ = require 'lodash'
 path = require 'path'
 assert = require 'assert'
+hasbin = require 'hasbin'
 
 { getFileInfo, attempt, execSync, hasLaterModificationTime, isBinaryExecutable } = require './utils'
 SRC_EXTENSIONS = require './source-extensions'
@@ -148,6 +149,7 @@ module.exports = class Program
 
         @hasSrcFile =  @srcFileStat?
         @hasExecFile = @execFileStat?
+        @hasBinaryInPath = hasbin.sync @execFile
         @index = Program.currentIndex++
 
         @arguments = calculateArguments @index
@@ -184,13 +186,13 @@ module.exports = class Program
     time: -> @timing = new ProgramTiming(@)
 
     ensureExecutable: ->
-        unless @isGuessed or @hasExecFile
+        unless @isGuessed or @hasExecFile or @hasBinaryInPath
             unless @hasSrcFile
                 logger.e "Program #{styler.id @execFile} doesn't exist or isn't readable"
             else
                 logger.e "Program #{styler.id @execFile} isn't compiled"
 
-        @hasExecFile
+        @hasExecFile or @hasBinaryInPath
 
     toString: -> @command
 

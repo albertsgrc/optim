@@ -19,7 +19,8 @@ module.exports = class ProgramFamily
             for source in attemptShell("ls",  "#{dir}").filter((s) -> s.match(sourcesPattern))
                 { dir2, name } = path.parse source
                 dir2 ?= "./"
-                "#{path.join(dir2, name)}.#{execExtension}"
+                maybeDot = if execExtension.length > 0 then "." else ""
+                "#{path.join(dir2, name)}#{maybeDot}#{execExtension}"
 
         found = _.union(sources, executables).sort().map((s) -> path.join(dir, s))
 

@@ -44,7 +44,6 @@ cli
     .option '-v, --verbose', "Show verbose output"
 
 # Equal command
-# TODO: Should add support for specifying input/output files
 cli
     .command 'equal <original-program> [others...]'
     .alias 'e'
@@ -129,8 +128,6 @@ cli
     .option '-r, --recursive', "Recursively delete executables on all directories"
     .option '-d, --deep', "Also remove oprofile output and all files ending in .out"
     .action clean
-
-# TODO: Macro creation command
 
 cli.help() if cli.notEnoughArguments
 tryToReplaceSecondAlias()

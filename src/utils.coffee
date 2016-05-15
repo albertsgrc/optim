@@ -156,7 +156,7 @@ handleError = (error, {
 
     answer in ['y', 'yes', 'yep', 'ye', 'sure', 'si', 'course', 'of course']
 
-@prettyDecimal = (value, { decimal_places = DFL_DECIMAL_PLACES } = {}) ->
+@prettyDecimal = (value, decimal_places = DFL_DECIMAL_PLACES) ->
     rounder = Math.pow 10, decimal_places
     Math.round(value*rounder)/rounder
 

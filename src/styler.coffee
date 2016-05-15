@@ -13,6 +13,7 @@ styles256 =
     cmd: chalk.underline
     id: chalk.italic
     value: chalk.bold
+    unit: chalk("#e4e4e4").italic
 
     okay: chalk("#87ff00")
     normal: chalk("#f1c40f")
@@ -37,6 +38,7 @@ styles16 =
     cmd: chalk.underline
     id: chalk.italic
     value: chalk.bold
+    unit: chalk.grey.italic
 
     okay: chalk.green
     normal: chalk.white

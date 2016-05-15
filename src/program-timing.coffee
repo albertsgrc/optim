@@ -38,7 +38,7 @@ module.exports = class ProgramTiming
 
         info = JSON.parse result
         info.cpu = info.user + info.sys
-        info.cpu_ratio = info.cpu/info.elapsed
+        info.cpu_ratio = 100*info.cpu/info.elapsed
 
         for prop, value of info
             delta = value - @[prop]

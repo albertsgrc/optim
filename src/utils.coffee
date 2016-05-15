@@ -129,6 +129,7 @@ handleError = (error, {
         throw error
 
     process.stderr.write = previousStderr
+
     { stderr, stdout: result }
 
 @isExecutable = (path) =>

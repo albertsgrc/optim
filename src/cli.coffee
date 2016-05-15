@@ -53,6 +53,12 @@ cli
         "Forward arguments to the programs", Program.addArguments
     .option '-l, --last',
         "Only check equality with the program with latest modification time"
+    .option '-i, --input-file [program-specification:]<file>',
+        "Specify file that will serve as input for the execution of the programs",
+        Program.addInputFile
+    .option '-s, --input-string [program-specification:]<string>',
+        "Specify string that will serve as input for the execution of the programs",
+        Program.addInputString
     .action check
 
 # Compile command
@@ -85,6 +91,13 @@ cli
         "Forward arguments to the programs", Program.addArguments
     .option '-l, --last',
         "Only compute info for the program with latest modification time"
+    .option '-i, --input-file [program-specification:]<file>',
+        "Specify file that will serve as input for the execution of the programs", Program.addInputFile
+    .option '-s, --input-string [program-specification:]<string>',
+        "Specify string that will serve as input for the execution of the programs", Program.addInputString
+    .option '-o, --output-file [program-specification:]<file>',
+        "Specify file that will serve as output for the execution of the programs.
+         If not specified output is ignored", Program.addOutputFile
     .action time
 
 # Profile command
@@ -92,10 +105,17 @@ cli
     .command 'profile <program> [others...]'
     .alias 'p'
     .description 'Profile the given programs'
-    .option '-o, --o-profile [:options-string]',
+    .option '-O, --o-profile [:options-string]',
         "Profile with OProfile's opannotate"
     .option '-g, --gprof [:options-string]', "Profile with gprof"
     .option '-n, --no-clean', "Do not clean profiler's intermediate files"
+    .option '-i, --input-file [program-specification:]<file>',
+        "Specify file that will serve as input for the execution of the programs"
+    .option '-s, --input-string [program-specification:]<string>',
+        "Specify string that will serve as input for the execution of the programs"
+    .option '-o, --output-file [program-specification:]<file>',
+        "Specify file that will serve as output for the execution of the programs.
+         If not specified output is ignored"
     .action -> console.log "Profile" # TODO: Implement
 
 # TODO: Analyze = Speedup + Profile command

@@ -33,6 +33,7 @@
     "is-executable": "^1.0.1",
     "lodash": "^4.6.1",
     "readline-sync": "^1.4.1",
+    "shell-quote": "^1.6.0",
     "shelljs": "^0.6.0",
     "unique-filename": "^1.1.0"
   }

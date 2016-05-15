@@ -1,7 +1,7 @@
 module.exports = FLAGS =
     oF: '-Ofast'
     oS: '-Os'
-    o3: '-O3 -march=native'
+    o3: ['-O3', '-march=native']
     o2: '-O2'
     o1: '-O1'
     o0: '-O0'
@@ -11,7 +11,7 @@ module.exports = FLAGS =
     s: '-static'
     ni: '-fno-inline'
 
-    pca: '-O3 -march=native -mfpmath=sse -ffloat-store -Wl,-s,-O1 -lm'
+    pca: ['-O3', '-march=native', '-mfpmath=sse', '-ffloat-store', '-Wl,-s,-O1', '-lm']
 
 ALIAS =
     0: 'o0'

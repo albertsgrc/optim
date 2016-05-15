@@ -63,11 +63,11 @@ module.exports = class Program
                         add program, what
 
 
-    calculateArguments = (programIndex) =>
-        argsAll = @argumentsByProgram.all ? ""
-        argsProg = @argumentsByProgram[programIndex] ? ""
+    joinAllWithThis = (structure, programIndex) =>
+        all = structure.all ? ""
+        prog = structure[programIndex] ? ""
 
-        (new ListString argsAll, argsProg).toString()
+        new ListString(all, prog)
 
     calculateCompilationFlags = (execFile, ext, programIndex, isGuessed) =>
         invalidFlag = (flag) =>
@@ -137,7 +137,7 @@ module.exports = class Program
         flagString.pushBack(@flagsByProgram.all ? "",
                             @flagsByProgram[programIndex] ? "")
 
-        flagString.toString()
+        flagString
 
     shouldCompile = (program) ->
         program.hasSrcFile and
@@ -149,10 +149,19 @@ module.exports = class Program
     @currentIndex: 0
     @argumentsByProgram: {}
     @flagsByProgram: {}
+    @inputFilesByProgram: {}
+    @inputStringsByProgram: {}
+    @outputFilesByProgram: {}
 
-    @addArguments: _.partial(addHelper, Program.argumentsByProgram)
+    @addArguments: _.partial addHelper, Program.argumentsByProgram
 
-    @addFlags: _.partial(addHelper, Program.flagsByProgram)
+    @addFlags: _.partial addHelper, Program.flagsByProgram
+
+    @addInputFile: _.partial addHelper, Program.inputFilesByProgram
+
+    @addInputString: _.partial addHelper, Program.inputStringsByProgram
+
+    @addOutputFile: _.partial addHelper, Program.outputFilesByProgram
 
     constructor: (@execFile, { @isGuessed = no, @isOriginal = no } = {}) ->
         assert _.isString(@execFile), "Executable file is not a String"
@@ -165,10 +174,24 @@ module.exports = class Program
         @hasBinaryInPath = hasbin.sync @execFile
         @index = Program.currentIndex++
 
-        @arguments = calculateArguments @index
+        @arguments = joinAllWithThis Program.argumentsByProgram, @index
         @compilationFlags = calculateCompilationFlags @execFile, @execExtension, @index, @isGuessed
+        @inputStrings = joinAllWithThis Program.inputStringsByProgram, @index
+        @inputFiles = joinAllWithThis Program.inputFilesByProgram, @index
+        @outputFiles = joinAllWithThis Program.outputFilesByProgram, @index
 
-        @command = new ListString(@execFile, @arguments).toString()
+        @hasInput = @inputStrings.array.length > 0 or @inputFiles.array.length > 0
+        @hasOutput = @outputFiles.array.length > 0
+
+        inputFilesFormatted = _.flatten @inputFiles.array.map((s) -> ['<', s])
+        outputFilesFormatted = _.flatten @outputFiles.array.map((s) -> ['>', s])
+
+        inputStringsString =
+            if @inputStrings.length > 0
+                "echo #{@inputStrings.array.join("\n")} | "
+            else
+                ""
+        @command = inputStringsString + new ListString(@execFile, @arguments, inputFilesFormatted, outputFilesFormatted).toString()
 
     compile: (explicitlyDemanded = no) ->
         unless @hasSrcFile or @hasExecFile
@@ -197,6 +220,8 @@ module.exports = class Program
         @hasExecFile = yes
 
     time: -> @timing = new ProgramTiming(@)
+
+    # TODO: Add method equalTo
 
     ensureExecutable: ->
         unless @isGuessed or @hasExecFile or @hasBinaryInPath

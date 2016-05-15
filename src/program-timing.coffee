@@ -6,6 +6,7 @@ DFL_REPETITIONS = 15
 DFL_TIME_LIMIT = 15
 
 TIMER_CMD = "#{__dirname}/timer/timer -ni"
+TIMER_CMD_DONT_IGNORE = "#{__dirname}/timer/timer -n"
 
 module.exports = class ProgramTiming
     @repetitions: DFL_REPETITIONS
@@ -25,14 +26,15 @@ module.exports = class ProgramTiming
         logger.e("Time limit argument must be > 0", { exit: yes, printStack: no }) if @timeLimit <= 0
 
     _timeExec: (i) ->
-        result = attempt execSync, "#{TIMER_CMD} #{@program.command}", { exit: no, printError: no }
+        timerCmd = if @program.hasOutput then TIMER_CMD_DONT_IGNORE else TIMER_CMD
+        result = attempt execSync, "#{timerCmd} #{@program.command}", { exit: no, printError: no }
 
         if result.isError
             logger.write(styler.error(" ERROR:") + " #{result.stderr?[...-1]}").endLine()
             process.exit 1 if @program.isOriginal
             return false
 
-        result = result.stdout
+        result = if @program.hasOutput then result.stderr else result.stdout
 
         info = JSON.parse result
         info.cpu = info.user + info.sys

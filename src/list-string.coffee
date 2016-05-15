@@ -1,33 +1,36 @@
 _ = require 'lodash'
 assert = require 'assert'
+{ quote } = require 'shell-quote'
 
 module.exports = class ListString
-    string: ""
-
     push = (how, elems...) ->
         for elem in elems
             if _.isArray elem
-                push how, elem...
+                push.apply @, [how].concat(elem)
             else if _.isString elem
                 elem = _.trim elem, ' '
                 continue if elem.length is 0
-                if @string.length is 0
-                    @string = elem
-                else
-                    @string = how @string, elem
+                how @, elem
             else if elem instanceof ListString
-                if @string.length is 0
-                    @string = elem.string
-                else
-                    @string = how @string, elem.string
+                how @, elem.array
             else
                 assert(false,
                     "Option should be either a string, an array of strings or a ListString")
 
-    constructor: (elems...) -> @pushBack elems...
+    constructor: (elems...) ->
+        @array = []
+        @pushBack elems...
 
-    pushFront: _.partial push, (string, elem) -> elem + " " + string
+    pushFront: _.partial push, (where, elem) ->
+        if _.isArray elem
+            where.array = elem.concat where.array
+        else
+            where.array.unshift elem
 
-    pushBack: _.partial push, (string, elem) -> string + " " + elem
+    pushBack: _.partial push, (where, elem) ->
+        if _.isArray elem
+            where.array = where.array.concat elem
+        else
+            where.array.push elem
 
-    toString: -> @string
+    toString: -> quote @array

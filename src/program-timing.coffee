@@ -48,7 +48,7 @@ module.exports = class ProgramTiming
         true
 
     _updateProgress: (i) ->
-        logger.updateInfo "Timing #{@program.toString()}... (#{i}/#{@repetitions ? '?'})"
+        logger.updateInfo "Timing #{styler.cmd @program.toString()}... (#{i}/#{@repetitions ? '?'})"
 
     constructor: (@program) ->
         @_m2 = {}
@@ -78,4 +78,4 @@ module.exports = class ProgramTiming
         else
             @[stat + 'Variance'] = @_m2[stat]/(@repetitions - 1) for stat in ProgramTiming.stats
 
-        logger.updateInfo("#{@program.toString()}:").endLine()
+        logger.updateInfo("#{styler.cmd @program.toString()}:").endLine()

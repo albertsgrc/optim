@@ -1,5 +1,5 @@
 module.exports = FLAGS =
-    oF: '-Ofast'
+    oF: ['-Ofast', '-march=native']
     oS: '-Os'
     o3: ['-O3', '-march=native']
     o2: '-O2'

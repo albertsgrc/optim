@@ -2,16 +2,14 @@ path = require 'path'
 _ = require 'lodash'
 assert = require 'assert'
 util = require 'util'
-
+{ OPTIMIZED_PROGRAMS_INDICATOR_PATTERN } = require './constants'
 Program = require './program'
 { attemptShell } = require './utils'
 
 module.exports = class ProgramFamily
-    @OPTIMIZED_PROGRAMS_SUFFIX: "-opt"
-
     guessOthers = ({ name, execExtension, srcExtension }, last) =>
         { dir, base } = path.parse name
-        pattern = "^#{base}#{@OPTIMIZED_PROGRAMS_SUFFIX}[^.]*\\."
+        pattern = "^#{base}#{OPTIMIZED_PROGRAMS_INDICATOR_PATTERN}[^.]*\\."
         executablesPattern = new RegExp(pattern + "#{execExtension}$")
         executables = attemptShell("ls", "#{dir}").filter((s) -> s.match(executablesPattern))
         sourcesPattern = new RegExp(pattern + "#{srcExtension}$")

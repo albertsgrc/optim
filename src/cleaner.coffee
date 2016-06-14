@@ -1,9 +1,10 @@
 { attemptShell, isBinaryExecutable } = require './utils'
 logger = require './logger'
 styler = require './styler'
+{ PROFILING_OUTPUT_FOLDER } = require './constants'
 _ = require 'lodash'
 
-@clean = ({ recursive = no, deep = no } = {}) ->
+@clean = ({ recursive = no, ultraDeep = no, deep = ultraDeep, } = {}) ->
     hasFileTool = attemptShell('which', 'file')?
 
     unless hasFileTool
@@ -20,7 +21,10 @@ _ = require 'lodash'
             (file) ->
                 isBinaryExecutable(file) or
                 file.match(/\.out$/) or
-                file.match(/oprofile_data/)
+                file.match(/oprofile_data/) or
+                (ultraDeep and (
+                    file is PROFILING_OUTPUT_FOLDER
+                ))
         else
             isBinaryExecutable
 

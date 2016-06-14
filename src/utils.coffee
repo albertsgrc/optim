@@ -10,10 +10,9 @@ readLineSync = require 'readline-sync'
 ListString = require './list-string'
 logger = require './logger'
 styler = require './styler'
+{ DFL_DECIMAL_PLACES } = require './constants'
 
 shelljs.config.silent = yes
-
-DFL_DECIMAL_PLACES = 3
 
 normalizeError = (err) -> err.toString().replace("Error: ", "")[...-1]
 

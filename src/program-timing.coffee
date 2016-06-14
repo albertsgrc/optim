@@ -1,10 +1,7 @@
 logger = require './logger'
 styler = require './styler'
 { attempt, execSync } = require './utils'
-
-DFL_REPETITIONS = 15
-DFL_TIME_LIMIT = 15
-
+{ DFL_TIME_LIMIT, DFL_REPETITIONS } = require './constants'
 TIMER_CMD = "#{__dirname}/timer/timer -ni"
 TIMER_CMD_DONT_IGNORE = "#{__dirname}/timer/timer -n"
 

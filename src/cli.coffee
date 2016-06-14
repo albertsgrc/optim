@@ -10,27 +10,30 @@ styler = require './styler'
 { check } = require './equality-checker'
 { compile } = require './compiler'
 { time } = require './timer'
+{ profile } = require './profiler'
+{ SECOND_ALIAS_FOR_COMMANDS } = require './constants'
 Program = require './program'
 
 ######### - Argument checks and preprocess - ##########
 N_META_ARGUMENTS = 2
+COMMANDS = [
+    'time', 't',
+    'clean', 'C',
+    'equal', 'e',
+    'compile', 'c',
+    'profile', 'p'
+]
 
 cli.notEnoughArguments = process.argv.length <= N_META_ARGUMENTS
 
 # Replace the command argument if it is a second alias defined for convenience
 # (Commander only allows one alias per command)
 tryToReplaceSecondAlias = ->
-    SECOND_ALIAS =
-        spd: 'time', speedup: 'time', s: 'time', rm: 'clean', cln: 'clean', eq: 'equal', pf: 'profile'
-        make: 'compile'
 
-    realCommand = SECOND_ALIAS[process.argv[N_META_ARGUMENTS]]
+    realCommand = SECOND_ALIAS_FOR_COMMANDS[process.argv[N_META_ARGUMENTS]]
     process.argv[N_META_ARGUMENTS] = realCommand if realCommand?
 
 checkCommandExists = ->
-    COMMANDS = ['time', 't', 'clean', 'C', 'equal', 'e', 'compile', 'c',
-                'profile', 'p']
-
     cmd = process.argv[N_META_ARGUMENTS]
     unless cmd in COMMANDS or cmd[0] is '-'
         logger.e("#{styler.id cmd} is not a optim command. Run #{styler.id 'optim --help'}
@@ -39,11 +42,21 @@ checkCommandExists = ->
 ######### - CLI command, options and version definitions- ##########
 cli.version version
 
+# TODO: Features for PCA Project:
+# - Configuration file with default options
+# - Compilation via Makefiles
+# - Hability to define tasks, wich group commands
+# - Profiling
+# - Custom equality check
+
 # Subcommand-independent options
 cli
     .option '-v, --verbose', "Show verbose output"
 
+# TODO: Add option to ignore certain exit codes when program crashes
+
 # Equal command
+
 cli
     .command 'equal <original-program> [others...]'
     .alias 'e'
@@ -104,21 +117,29 @@ cli
     .command 'profile <program> [others...]'
     .alias 'p'
     .description 'Profile the given programs'
-    .option '-O, --o-profile [:options-string]',
-        "Profile with OProfile's opannotate"
-    .option '-g, --gprof [:options-string]', "Profile with gprof"
+    .option '-c, --cycles'
+    .option '-b, --branch-mispredictions'
+    .option '-m, --llc-misses'
+    .option '-L, --l2-misses'
+    .option '-l, --l1-misses'
+    .option '-a, --assembly',
+        "Annotate assembly code instead of C code"
+    .option '-f, --forward-options [program-specification:]<options>',
+        "Forward options to the profiler (operf or gprof)"
+    .option '-g, --gprof', "Profile with gprof"
     .option '-n, --no-clean', "Do not clean profiler's intermediate files"
     .option '-i, --input-file [program-specification:]<file>',
-        "Specify file that will serve as input for the execution of the programs"
+        "Specify file that will serve as input for the execution of the programs", Program.addInputFile
     .option '-s, --input-string [program-specification:]<string>',
-        "Specify string that will serve as input for the execution of the programs"
+        "Specify string that will serve as input for the execution of the programs", Program.addInputString
     .option '-o, --output-file [program-specification:]<file>',
         "Specify file that will serve as output for the execution of the programs.
-         If not specified output is ignored"
-    .action -> console.log "Profile" # TODO: Implement
+         If not specified output is ignored", Program.addOutputFile
+    .option '-S, --save [filename]'
+    .action profile
 
-# TODO: Analyze = Speedup + Profile command
-# TODO: All = Check + Speedup + Profile command
+# Assembly command
+# TODO
 
 # Clean command
 cli
@@ -127,10 +148,11 @@ cli
     .description "Remove all executables in the directory"
     .option '-r, --recursive', "Recursively delete executables on all directories"
     .option '-d, --deep', "Also remove oprofile output and all files ending in .out"
+    .option '-u, --ultra-deep', "Also remove generated profiling result files"
     .action clean
 
-cli.help() if cli.notEnoughArguments
-tryToReplaceSecondAlias()
-checkCommandExists()
+do cli.help if cli.notEnoughArguments
+do tryToReplaceSecondAlias
+do checkCommandExists
 
 cli.parse process.argv

@@ -6,9 +6,8 @@ ProgramTiming = require './program-timing'
 logger = require './logger'
 { prettyDecimal, compartimentedString } = require './utils'
 styler = require './styler'
+{ DFL_DECIMAL_PLACES: DECIMALS, DFL_CONFIDENCE_RATE } = require './constants'
 
-DFL_CONFIDENCE_RATE = 0.05
-DECIMALS = 3
 SPACES_BY_COL = [
     10
     Math.max(11, 5 + DECIMALS)

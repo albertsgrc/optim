@@ -4,6 +4,7 @@ _ = require 'lodash'
 
 { getNonOcuppyingLength } = require './utils'
 styler = require './styler'
+{ TAG_INDICATOR, MINIMUM_COLS_FOR_LINEBREAK } = require './constants'
 
 # Alias
 { stdout, stderr } = process
@@ -11,17 +12,15 @@ styler = require './styler'
 # Constants
 [ INFO, WARN, ERROR, VERBOSE ] = TAGS = [ "INFO", "WARN", "ERROR", "VERBS" ]
 LEFT_MARGIN = _.maxBy(TAGS, _.size).length + 1
-TAG_INDICATOR = ': '
 LEFT_PADSTRING_LONG_LINES = _.repeat(" ", LEFT_MARGIN + TAG_INDICATOR.length)
-MAX_COLS_PER_LINE = stdout.columns - 1
-MINIMUM_COLS = 15
+MAX_COLS_PER_LINE = stdout.columns - 1 # HACK: Assumes application won't last long
 
 # Private methods
 
 tag = (txt, style, tagString) -> style(_.padEnd(txt, LEFT_MARGIN)) + tagString
 
 fold = (string, leftPad = LEFT_PADSTRING_LONG_LINES) ->
-    cols = Math.max MINIMUM_COLS, MAX_COLS_PER_LINE - leftPad.length
+    cols = Math.max MINIMUM_COLS_FOR_LINEBREAK, MAX_COLS_PER_LINE - leftPad.length
     chunks = string.split("\n")
 
     foldImm = (str) ->

@@ -46,7 +46,7 @@ module.exports = class Program
             if where[who]?
                 where[who].pushBack what
             else
-                where[who] = new ListString(what)
+                where[who] = new ListString(what.split(','))
 
         if info.length is 1
             add 'all', argspec

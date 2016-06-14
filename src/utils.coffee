@@ -7,6 +7,7 @@ isExe = require 'is-executable'
 readLineSync = require 'readline-sync'
 { stripColor } = require 'chalk'
 
+ListString = require './list-string'
 logger = require './logger'
 styler = require './styler'
 
@@ -140,7 +141,7 @@ handleError = (error, {
 @isBinaryExecutable = (path) =>
     assert _.isString(path), "Argument must be file path (string)"
 
-    res = @attempt(@execSync, "file #{path}", { allowedErrors: [1] })
+    res = @attempt(@execSync, new ListString("file", path).toString(), { allowedErrors: [1] })
 
     unless res?
         false

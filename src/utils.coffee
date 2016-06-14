@@ -165,11 +165,11 @@ handleError = (error, {
 
 COMPARTMENT_SEPARATOR = " | "
 
-@compartimentedString = (values...) =>
+@compartimentedString = (spaces, values...) =>
     string = ""
-    for { value, space, padKind = "End" }, i in values
+    for { value, padKind = "End" }, i in values
         string += COMPARTMENT_SEPARATOR if i > 0 and values[i-1].value.length > 0
-        padding = space + @getNonOcuppyingLength(value)
+        padding = spaces[i] + @getNonOcuppyingLength(value)
         padding += COMPARTMENT_SEPARATOR.length if value.length is 0
         string += _['pad' + padKind](value, padding)
 

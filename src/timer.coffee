@@ -9,7 +9,16 @@ styler = require './styler'
 
 DFL_CONFIDENCE_RATE = 0.05
 DECIMALS = 3
-SPACES_BY_COL = [10, Math.max(11, 5 + DECIMALS), Math.max(3, 6 + DECIMALS), Math.max(11, 6 + DECIMALS), Math.max(7, 6 + DECIMALS), 6, Math.max(6, 6 + DECIMALS), 4]
+SPACES_BY_COL = [
+    10
+    Math.max(11, 5 + DECIMALS)
+    Math.max(3, 6 + DECIMALS)
+    Math.max(11, 6 + DECIMALS)
+    Math.max(7, 6 + DECIMALS)
+    6
+    Math.max(6, 6 + DECIMALS)
+    4
+]
 
 isFaster = ({ cpu: meanOpt,  repetitions: repsOpt,  cpuVariance: varianceOpt },
             { cpu: meanOriginal, repetitions: repsOriginal, cpuVariance: varianceOriginal}, confidence) ->
@@ -76,25 +85,27 @@ prettySpeedup = (speedup) ->
 
     return unless programs.original.ensureExecutable()
 
-    logger.noTag compartimentedString({ value: chalk.bold("Is faster?"),  space: SPACES_BY_COL[0] }
-                                      { value: chalk.bold("CPU Speedup"), space: SPACES_BY_COL[1] }
-                                      { value: chalk.bold("CPU"),         space: SPACES_BY_COL[2] }
-                                      { value: chalk.bold("Elp Speedup"), space: SPACES_BY_COL[3] }
-                                      { value: chalk.bold("Elapsed"),     space: SPACES_BY_COL[4] }
-                                      { value: chalk.bold("CPU%"),        space: SPACES_BY_COL[5] }
-                                      { value: chalk.bold("Memory"),      space: SPACES_BY_COL[6] }
-                                      { value: chalk.bold("Reps"), space: SPACES_BY_COL[7] })
+    logger.noTag compartimentedString(SPACES_BY_COL,
+                                      { value: chalk.bold("Is faster?") }
+                                      { value: chalk.bold("CPU Speedup") }
+                                      { value: chalk.bold("CPU") }
+                                      { value: chalk.bold("Elp Speedup") }
+                                      { value: chalk.bold("Elapsed") }
+                                      { value: chalk.bold("CPU%") }
+                                      { value: chalk.bold("Memory") }
+                                      { value: chalk.bold("Reps") })
 
     originalTiming = programs.original.time()
 
-    logger.noTag compartimentedString({ value: styler.normal("N/A"), space: SPACES_BY_COL[0], padKind: "Start" },
-                                      { value: styler.normal("N/A"), space: SPACES_BY_COL[1] },
-                                      { value: "#{styler.value(toSecs(originalTiming.cpu))}#{styler.unit 's'}", space: SPACES_BY_COL[2] },
-                                      { value: styler.normal("N/A"), space: SPACES_BY_COL[3] },
-                                      { value: "#{styler.value(toSecs(originalTiming.elapsed))}#{styler.unit 's'}", space: SPACES_BY_COL[4]}
-                                      { value: "#{styler.value(prettyDecimal(originalTiming.cpu_ratio, 2))}#{styler.unit '%'}", space: SPACES_BY_COL[5] }
-                                      { value: "#{prettyMemory originalTiming.mem_max}", space: SPACES_BY_COL[6] },
-                                      { value: "#{styler.value originalTiming.repetitions}", space: SPACES_BY_COL[7] })
+    logger.noTag compartimentedString(SPACES_BY_COL,
+                                      { value: styler.normal("N/A"), padKind: "Start" },
+                                      { value: styler.normal("N/A") },
+                                      { value: "#{styler.value(toSecs(originalTiming.cpu))}#{styler.unit 's'}" },
+                                      { value: styler.normal("N/A") },
+                                      { value: "#{styler.value(toSecs(originalTiming.elapsed))}#{styler.unit 's'}" }
+                                      { value: "#{styler.value(prettyDecimal(originalTiming.cpu_ratio, 2))}#{styler.unit '%'}" }
+                                      { value: "#{prettyMemory originalTiming.mem_max}" },
+                                      { value: "#{styler.value originalTiming.repetitions}" })
 
     for program in programs.others
         continue unless program.ensureExecutable()
@@ -116,11 +127,12 @@ prettySpeedup = (speedup) ->
             else
                 styler.normal('UNKNOWN')
 
-        logger.noTag compartimentedString({ value: chalk.bold(fasterString), space: SPACES_BY_COL[0], padKind: "Start" },
-                                          { value: "#{prettySpeedup cpuSpeedup}", space: SPACES_BY_COL[1] },
-                                          { value: "#{styler.value(toSecs(timing.cpu))}#{styler.unit 's'}", space: SPACES_BY_COL[2] },
+        logger.noTag compartimentedString(SPACES_BY_COL,
+                                          { value: chalk.bold(fasterString), padKind: "Start" },
+                                          { value: "#{prettySpeedup cpuSpeedup}" },
+                                          { value: "#{styler.value(toSecs(timing.cpu))}#{styler.unit 's'}" },
                                           { value: "#{prettySpeedup elpSpeedup }", space: SPACES_BY_COL[3] }
-                                          { value: "#{styler.value(toSecs(timing.elapsed))}#{styler.unit 's'}", space: SPACES_BY_COL[4] }
-                                          { value: "#{styler.value(prettyDecimal(originalTiming.cpu_ratio, 2))}#{styler.unit '%'}", space: SPACES_BY_COL[5] }
-                                          { value: "#{prettyMemory timing.mem_max}", space: SPACES_BY_COL[6] },
-                                          { value: "#{styler.value timing.repetitions}", space: SPACES_BY_COL[7] })
+                                          { value: "#{styler.value(toSecs(timing.elapsed))}#{styler.unit 's'}" }
+                                          { value: "#{styler.value(prettyDecimal(originalTiming.cpu_ratio, 2))}#{styler.unit '%'}" }
+                                          { value: "#{prettyMemory timing.mem_max}" },
+                                          { value: "#{styler.value timing.repetitions}" })

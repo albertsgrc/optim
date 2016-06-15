@@ -52,3 +52,6 @@ module.exports = @
 
 # Timer
 @DFL_CONFIDENCE_RATE = 0.05
+
+# Assembly
+@ASSEMBLY_OUTPUT_FOLDER = "assembly"

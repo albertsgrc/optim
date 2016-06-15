@@ -11,7 +11,8 @@ styler = require './styler'
 { compile } = require './compiler'
 { time } = require './timer'
 { profile, addProfilingOption, OPERF_EVENTS_REGEX } = require './profiler'
-{ SECOND_ALIAS_FOR_COMMANDS, PROFILING_OUTPUT_FOLDER, OPERF_EVENTS } = require './constants'
+{ assembly } = require './assembly'
+{ SECOND_ALIAS_FOR_COMMANDS, PROFILING_OUTPUT_FOLDER, OPERF_EVENTS, ASSEMBLY_OUTPUT_FOLDER } = require './constants'
 Program = require './program'
 
 ######### - Argument checks and preprocess - ##########
@@ -21,7 +22,8 @@ COMMANDS = [
     'clean', 'C',
     'equal', 'e',
     'compile', 'c',
-    'profile', 'p'
+    'profile', 'p',
+    'assembly', 'a'
 ]
 
 cli.notEnoughArguments = process.argv.length <= N_META_ARGUMENTS
@@ -46,7 +48,6 @@ cli.version version
 # - Configuration file with default options
 # - Compilation via Makefiles
 # - Hability to define tasks, wich group commands
-# - Profiling
 # - Custom equality check
 
 # Subcommand-independent options
@@ -146,7 +147,16 @@ cli
     .action profile
 
 # Assembly command
-# TODO
+cli
+    .command 'assembly <program> [others...]'
+    .alias 'a'
+    .description 'Output assembly code of an executable'
+    .option '-p, --pretty', "Interleave assembly with the corresponding lines of code"
+    .option '-A, --all',
+        "Output assembly of all programs. Otherwise only of the program with latest modification time"
+    .option '-F, --save-file [filename]',
+        "Save output to file inside #{ASSEMBLY_OUTPUT_FOLDER} folder"
+    .action assembly
 
 # Clean command
 cli

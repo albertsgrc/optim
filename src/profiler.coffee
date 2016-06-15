@@ -56,7 +56,7 @@ profilingOptions = []
 
             gprofCmd = new ListString("gprof", "-b", profilingOptions, program.execFile).toString()
 
-            logger.i "Profiling #{gprofCmd}..."
+            logger.i "Profiling #{styler.cmd gprofCmd}..."
 
             result = attempt execSync, gprofCmd.toString(), { exit: no }
         else
@@ -65,14 +65,14 @@ profilingOptions = []
             operfCmd = new ListString("operf", "--event=#{eventName}:#{eventCount}").toString()
             cmd = "#{operfCmd} #{program.command}"
 
-            logger.i "Profiling #{cmd}..."
+            logger.i "Profiling #{styler.cmd cmd}..."
 
             operfRes = attempt execSync, cmd, { exit: no }
             continue if operfRes.isError
 
             opannotateCmd = new ListString("opannotate", (if assembly then "--assembly" else "--source"), program.execFile).toString()
 
-            logger.i "Annotating #{opannotateCmd}..."
+            logger.i "Annotating #{styler.cmd opannotateCmd}..."
 
             result = attempt execSync, opannotateCmd, { exit: no }
 

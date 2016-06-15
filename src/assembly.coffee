@@ -32,7 +32,7 @@ module.exports = @
 
         cmd = new ListString('objdump', (if pretty then '-S' else ''), '-d', program.execFile).toString()
 
-        logger.i "Assembly of #{styler.id program.execFile}:"
+        logger.i "Retrieving assembly #{styler.cmd cmd}...:"
 
         result = attempt execSync, cmd, { exit: no }
 

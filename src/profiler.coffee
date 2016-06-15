@@ -25,6 +25,15 @@ profilingOptions = []
                                 all = no
                                 counter
                               } = {}) ->
+    if gprof
+        unless attemptShell('which', 'gprof')?
+            logger.e "Program #{styler.id 'gprof'} is required for this command.", { exit: yes, printStack: no }
+    else
+        unless attemptShell('which', 'operf')?
+            logger.e "Program #{styler.id 'operf'} is required for this command.", { exit: yes, printStack: no }
+        unless attemptShell('which', 'opannotate')?
+            logger.e "Program #{styler.id 'opannotate'} is required for this command.", { exit: yes, printStack: no }
+
     programs = new ProgramFamily original, others
 
     unless all

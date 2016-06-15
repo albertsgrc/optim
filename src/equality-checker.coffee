@@ -7,7 +7,7 @@ styler = require './styler'
 logger = require './logger'
 
 @check = (original, others, { last = no } = {}) ->
-    programs = new ProgramFamily original, others, { last }
+    programs = new ProgramFamily original, others
 
     # Check that all programs are executable
 
@@ -16,6 +16,9 @@ logger = require './logger'
     unless programs.others.length > 0
         logger.w("No program was found to compare with #{styler.id original}")
         process.exit 0
+
+    if last
+        programs.others = programs.allSortedByMt[-1..]
 
     outputFileOriginal = uniqueFilename os.tmpDir()
 

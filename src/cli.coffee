@@ -10,7 +10,7 @@ styler = require './styler'
 { check } = require './equality-checker'
 { compile } = require './compiler'
 { time } = require './timer'
-{ profile } = require './profiler'
+{ profile, addProfilingOption } = require './profiler'
 { SECOND_ALIAS_FOR_COMMANDS } = require './constants'
 Program = require './program'
 
@@ -101,8 +101,9 @@ cli
         "Confidence rate for the T-Student test"
     .option '-a, --forward-args [program-specification:]<arguments-string>',
         "Forward arguments to the programs", Program.addArguments
-    .option '-l, --last',
-        "Only compute info for the program with latest modification time"
+    .option '-A, --all',
+        "Compute info for all the programs. Otherwise compute for the two with greatest modification time"
+    # TODO: Add option to compare speedup within last two
     .option '-i, --input-file [program-specification:]<file>',
         "Specify file that will serve as input for the execution of the programs", Program.addInputFile
     .option '-s, --input-string [program-specification:]<string>',
@@ -117,15 +118,13 @@ cli
     .command 'profile <program> [others...]'
     .alias 'p'
     .description 'Profile the given programs'
-    .option '-c, --cycles'
-    .option '-b, --branch-mispredictions'
-    .option '-m, --llc-misses'
-    .option '-L, --l2-misses'
-    .option '-l, --l1-misses'
+    .option '-l, --last',
+        "Only profile the program with latest modification time"
+    .option '-e, --event [event]', "Event which is going to be profiled", /^(cycles|branches|llc|l2|l1)$/i, 'cycles'
     .option '-a, --assembly',
         "Annotate assembly code instead of C code"
     .option '-f, --forward-options [program-specification:]<options>',
-        "Forward options to the profiler (operf or gprof)"
+        "Forward options to the profiler (operf or gprof)", addProfilingOption
     .option '-g, --gprof', "Profile with gprof"
     .option '-n, --no-clean', "Do not clean profiler's intermediate files"
     .option '-i, --input-file [program-specification:]<file>',

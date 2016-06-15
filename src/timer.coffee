@@ -76,13 +76,19 @@ prettySpeedup = (speedup) ->
                              repetitions
                              timeLimit
                              confidenceRate = DFL_CONFIDENCE_RATE
-                             last = no
+                             all = no
                            } = {}) ->
     ProgramTiming.configure({ forceRepetitions, repetitions, timeLimit })
 
-    programs = new ProgramFamily original, others, { last }
+    programs = new ProgramFamily original, others
+
+    unless all
+        lastTwo = programs.allSortedByMt[-2..]
+        programs.original = lastTwo[0]
+        programs.others = if lastTwo.length > 1 then [lastTwo[1]] else []
 
     return unless programs.original.ensureExecutable()
+
 
     logger.noTag compartimentedString(SPACES_BY_COL,
                                       { value: chalk.bold("Is faster?") }

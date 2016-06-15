@@ -7,7 +7,7 @@ Program = require './program'
 { attemptShell } = require './utils'
 
 module.exports = class ProgramFamily
-    guessOthers = ({ name, execExtension, srcExtension }, last) =>
+    guessOthers = ({ name, execExtension, srcExtension }) =>
         { dir, base } = path.parse name
         pattern = "^#{base}#{OPTIMIZED_PROGRAMS_INDICATOR_PATTERN}[^.]*\\."
         executablesPattern = new RegExp(pattern + "#{execExtension}$")
@@ -26,22 +26,15 @@ module.exports = class ProgramFamily
             for execFile, index in found
                 new Program(execFile, isGuessed: yes)
 
-        if last and programs.length > 0
-            programs = [_.maxBy(programs,
-                (p) ->
-                    stat = if p.hasSrcFile then p.srcFileStat else p.execFileStat
-                    new Date(stat.mtime).getTime()
-            )]
-
         programs
 
-    constructor: (@original, @others = [], { last = no, shouldGuess = yes } = {}) ->
+    constructor: (@original, @others = [], { shouldGuess = yes } = {}) ->
         @original = new Program(@original, { isOriginal: yes }) if _.isString @original
 
         assert(@original instanceof Program, "original parameter is not a program nor string")
 
         if shouldGuess and @others.length is 0
-            @others = guessOthers(@original, last)
+            @others = guessOthers(@original)
         else
             @others[i] = new Program(v) for v, i in @others
 
@@ -49,6 +42,12 @@ module.exports = class ProgramFamily
 
         @all = [@original].concat(@others)
 
+        @allSortedByMt = @all.sort(
+            (a, b) ->
+                statA = if a.hasSrcFile then a.srcFileStat else a.execFileStat
+                statB = if b.hasSrcFile then b.srcFileStat else b.execFileStat
+                new Date(statA.mtime).getTime() - new Date(statB.mtime).getTime()
+        )
     compile: ->
         program.compile() for program in @all
 

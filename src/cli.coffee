@@ -10,8 +10,8 @@ styler = require './styler'
 { check } = require './equality-checker'
 { compile } = require './compiler'
 { time } = require './timer'
-{ profile, addProfilingOption, OPERF_EVENTS_REGEX, OPERF_EVENTS } = require './profiler'
-{ SECOND_ALIAS_FOR_COMMANDS, PROFILING_OUTPUT_FOLDER } = require './constants'
+{ profile, addProfilingOption, OPERF_EVENTS_REGEX } = require './profiler'
+{ SECOND_ALIAS_FOR_COMMANDS, PROFILING_OUTPUT_FOLDER, OPERF_EVENTS } = require './constants'
 Program = require './program'
 
 ######### - Argument checks and preprocess - ##########
@@ -61,7 +61,7 @@ cli
     .command 'equal <original-program> [others...]'
     .alias 'e'
     .description 'Check equality of stdout output to verify correctness'
-    .option '-a, --forward-args <[program-specification:]arguments-string>',
+    .option '-a, --forward-args [program-specification:]<arguments-string>',
         "Forward arguments to the programs", Program.addArguments
     .option '-A, --all',
         "Check equality for all programs. Otherwise check only for the program with latest modification time"
@@ -122,20 +122,19 @@ cli
     .option '-A, --all',
         "Profile all programs. Otherwise profile only the program with latest modification time"
     .option '-e, --event [event]',
-        "Event which is going to be profiled. One of #{(key for key of OPERF_EVENTS).toString()}",
+        "Event which is going to be profiled. One of: #{(key for key of OPERF_EVENTS).join(', ')}",
         OPERF_EVENTS_REGEX,
         'cycles'
     .option '-c, --counter [counter]', "Specify event counter value"
     .option '-S, --assembly',
         "Annotate assembly code instead of C code"
     .option '-F, --save-file [filename]',
-        "Save the profiling output to a file inside the folder #{PROFILING_OUTPUT_FOLDER}.
-         If filename is not specified the filename will be of the form <program-executable>_<timestamp>.(ann|gprof).txt"
+        "Save output to file inside #{PROFILING_OUTPUT_FOLDER} folder"
     .option '-g, --gprof', "Profile with gprof"
     .option '-n, --no-clean', "Do not clean profiler's intermediate files"
     .option '-f, --forward-options [program-specification:]<options>',
         "Forward options to the profiler (operf or gprof)", addProfilingOption
-    .option '-a, --forward-args <[program-specification:]arguments-string>',
+    .option '-a, --forward-args [program-specification:]<arguments-string>',
         "Forward arguments to the programs", Program.addArguments
     .option '-i, --input-file [program-specification:]<file>',
         "Specify file that will serve as input for the execution of the programs", Program.addInputFile

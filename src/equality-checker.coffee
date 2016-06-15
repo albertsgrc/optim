@@ -6,7 +6,7 @@ ProgramFamily = require './program-family'
 styler = require './styler'
 logger = require './logger'
 
-@check = (original, others, { last = no } = {}) ->
+@check = (original, others, { all = no } = {}) ->
     programs = new ProgramFamily original, others
 
     # Check that all programs are executable
@@ -17,8 +17,8 @@ logger = require './logger'
         logger.w("No program was found to compare with #{styler.id original}")
         process.exit 0
 
-    if last
-        programs.others = programs.allSortedByMt[-1..]
+    unless all
+        programs.others = programs.allExecutableSortedByMt[-1..]
 
     outputFileOriginal = uniqueFilename os.tmpDir()
 

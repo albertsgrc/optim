@@ -42,12 +42,13 @@ module.exports = class ProgramFamily
 
         @all = [@original].concat(@others)
 
-        @allSortedByMt = @all.sort(
-            (a, b) ->
-                statA = if a.hasSrcFile then a.srcFileStat else a.execFileStat
-                statB = if b.hasSrcFile then b.srcFileStat else b.execFileStat
-                new Date(statA.mtime).getTime() - new Date(statB.mtime).getTime()
-        )
+        @allSortedByMt = _.sortBy(@all,
+            (p) ->
+                stat = if p.hasSrcFile then p.srcFileStat else p.execFileStat
+                new Date(stat.mtime).getTime()
+            )
+
+        @allExecutableSortedByMt = _.filter(@allSortedByMt, (p) -> p.hasExecFile)
     compile: ->
         program.compile() for program in @all
 

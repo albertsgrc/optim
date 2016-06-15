@@ -8,6 +8,6 @@ module.exports = @
                                 gprof = no
                                 noClean = no
                                 save = no
-                                last = no
+                                all = no
                               }) ->
     programs = new ProgramFamily original, others

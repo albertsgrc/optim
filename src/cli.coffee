@@ -63,8 +63,8 @@ cli
     .description 'Check equality of stdout output to verify correctness'
     .option '-a, --forward-args <[program-specification:]arguments-string>',
         "Forward arguments to the programs", Program.addArguments
-    .option '-l, --last',
-        "Only check equality with the program with latest modification time"
+    .option '-A, --all',
+        "Check equality for all programs. Otherwise check only for the program with latest modification time"
     .option '-i, --input-file [program-specification:]<file>',
         "Specify file that will serve as input for the execution of the programs",
         Program.addInputFile
@@ -83,6 +83,7 @@ cli
         "Indicate flags to forward to the compilation of programs", Program.addFlags
     .option '-s, --single', 'Only compile the given program. Otherwise, similar
                              programs are searched and compiled in lexicographic order'
+    .option '-l, --last', 'Only compile the original and lastly modified programs'
     .action compile
 
 # Speedup command
@@ -103,6 +104,7 @@ cli
         "Forward arguments to the programs", Program.addArguments
     .option '-A, --all',
         "Compute info for all the programs. Otherwise compute for the two with greatest modification time"
+    .option '-F, --first', "Compute speedup only with the original program. Ignored if --all is specified."
     # TODO: Add option to compare speedup within last two
     .option '-i, --input-file [program-specification:]<file>',
         "Specify file that will serve as input for the execution of the programs", Program.addInputFile
@@ -118,15 +120,17 @@ cli
     .command 'profile <program> [others...]'
     .alias 'p'
     .description 'Profile the given programs'
-    .option '-l, --last',
-        "Only profile the program with latest modification time"
+    .option '-A, --all',
+        "Profile all programs. Otherwise profile only the program with latest modification time"
     .option '-e, --event [event]', "Event which is going to be profiled", /^(cycles|branches|llc|l2|l1)$/i, 'cycles'
-    .option '-a, --assembly',
+    .option '-S, --assembly',
         "Annotate assembly code instead of C code"
     .option '-f, --forward-options [program-specification:]<options>',
         "Forward options to the profiler (operf or gprof)", addProfilingOption
     .option '-g, --gprof', "Profile with gprof"
     .option '-n, --no-clean', "Do not clean profiler's intermediate files"
+    .option '-a, --forward-args <[program-specification:]arguments-string>',
+        "Forward arguments to the programs", Program.addArguments
     .option '-i, --input-file [program-specification:]<file>',
         "Specify file that will serve as input for the execution of the programs", Program.addInputFile
     .option '-s, --input-string [program-specification:]<string>',

@@ -77,13 +77,18 @@ prettySpeedup = (speedup) ->
                              timeLimit
                              confidenceRate = DFL_CONFIDENCE_RATE
                              all = no
+                             first = no
                            } = {}) ->
     ProgramTiming.configure({ forceRepetitions, repetitions, timeLimit })
 
     programs = new ProgramFamily original, others
 
     unless all
-        lastTwo = programs.allSortedByMt[-2..]
+        lastTwo =
+            if first
+                [programs.original].concat(programs.allExecutableSortedByMt[-1..])
+            else
+                programs.allExecutableSortedByMt[-2..]
         programs.original = lastTwo[0]
         programs.others = if lastTwo.length > 1 then [lastTwo[1]] else []
 

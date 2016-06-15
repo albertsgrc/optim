@@ -92,6 +92,10 @@ prettySpeedup = (speedup) ->
         programs.original = lastTwo[0]
         programs.others = if lastTwo.length > 1 then [lastTwo[1]] else []
 
+    unless programs.original?
+        logger.w("No program was found matching #{styler.id original}")
+        process.exit 0
+
     return unless programs.original.ensureExecutable()
 
 

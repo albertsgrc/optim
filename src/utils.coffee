@@ -14,7 +14,10 @@ styler = require './styler'
 
 shelljs.config.silent = yes
 
-normalizeError = (err) -> err.toString().replace("Error: ", "")[...-1]
+normalizeError = (err) ->
+    s = err.toString().replace("Error: ", "")
+    s = s[...-1] if s[s.length - 1] is '\n'
+    s
 
 handleError = (error, {
                         exit = yes # Whether the process may exit on non-allowed error

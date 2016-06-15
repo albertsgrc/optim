@@ -5,6 +5,25 @@ module.exports = @
 
 # Profiling
 @PROFILING_OUTPUT_FOLDER = "profiling"
+@OPERF_EVENTS =
+    cycles:
+        event: 'CPU_CLK_UNHALTED'
+        counter: 50000
+    llc:
+        event: 'LLC_MISSES'
+        counter: 50000
+    l2:
+        event: 'LLC_REFS'
+        counter: 50000
+    l1:
+        event: 'l2_rqsts'
+        counter: 200000
+    tlb:
+        event: 'dtlb_load_misses'
+        counter: 2000000
+    branches:
+        event: 'br_misp_retired'
+        counter: 400000
 
 # CLI constants
 @SECOND_ALIAS_FOR_COMMANDS =

@@ -10,8 +10,8 @@ styler = require './styler'
 { check } = require './equality-checker'
 { compile } = require './compiler'
 { time } = require './timer'
-{ profile, addProfilingOption } = require './profiler'
-{ SECOND_ALIAS_FOR_COMMANDS } = require './constants'
+{ profile, addProfilingOption, OPERF_EVENTS_REGEX, OPERF_EVENTS } = require './profiler'
+{ SECOND_ALIAS_FOR_COMMANDS, PROFILING_OUTPUT_FOLDER } = require './constants'
 Program = require './program'
 
 ######### - Argument checks and preprocess - ##########
@@ -105,7 +105,6 @@ cli
     .option '-A, --all',
         "Compute info for all the programs. Otherwise compute for the two with greatest modification time"
     .option '-F, --first', "Compute speedup only with the original program. Ignored if --all is specified."
-    # TODO: Add option to compare speedup within last two
     .option '-i, --input-file [program-specification:]<file>',
         "Specify file that will serve as input for the execution of the programs", Program.addInputFile
     .option '-s, --input-string [program-specification:]<string>',
@@ -122,13 +121,20 @@ cli
     .description 'Profile the given programs'
     .option '-A, --all',
         "Profile all programs. Otherwise profile only the program with latest modification time"
-    .option '-e, --event [event]', "Event which is going to be profiled", /^(cycles|branches|llc|l2|l1)$/i, 'cycles'
+    .option '-e, --event [event]',
+        "Event which is going to be profiled. One of #{(key for key of OPERF_EVENTS).toString()}",
+        OPERF_EVENTS_REGEX,
+        'cycles'
+    .option '-c, --counter [counter]', "Specify event counter value"
     .option '-S, --assembly',
         "Annotate assembly code instead of C code"
-    .option '-f, --forward-options [program-specification:]<options>',
-        "Forward options to the profiler (operf or gprof)", addProfilingOption
+    .option '-F, --save-file [filename]',
+        "Save the profiling output to a file inside the folder #{PROFILING_OUTPUT_FOLDER}.
+         If filename is not specified the filename will be of the form <program-executable>_<timestamp>.(ann|gprof).txt"
     .option '-g, --gprof', "Profile with gprof"
     .option '-n, --no-clean', "Do not clean profiler's intermediate files"
+    .option '-f, --forward-options [program-specification:]<options>',
+        "Forward options to the profiler (operf or gprof)", addProfilingOption
     .option '-a, --forward-args <[program-specification:]arguments-string>',
         "Forward arguments to the programs", Program.addArguments
     .option '-i, --input-file [program-specification:]<file>',
@@ -138,7 +144,6 @@ cli
     .option '-o, --output-file [program-specification:]<file>',
         "Specify file that will serve as output for the execution of the programs.
          If not specified output is ignored", Program.addOutputFile
-    .option '-S, --save [filename]'
     .action profile
 
 # Assembly command

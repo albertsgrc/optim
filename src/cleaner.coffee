@@ -1,11 +1,11 @@
-{ attemptShell, isBinaryExecutable } = require './utils'
+{ attemptShell, isBinaryExecutable , hasProgramInstalled} = require './utils'
 logger = require './logger'
 styler = require './styler'
 { PROFILING_OUTPUT_FOLDER } = require './constants'
 _ = require 'lodash'
 
 @clean = ({ recursive = no, ultraDeep = no, deep = ultraDeep, } = {}) ->
-    hasFileTool = attemptShell('which', 'file')?
+    hasFileTool = hasProgramInstalled 'file'
 
     unless hasFileTool
         if process.platform is "win32"

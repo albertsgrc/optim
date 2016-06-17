@@ -2,7 +2,7 @@ fs = require 'fs'
 path = require 'path'
 
 ProgramFamily = require './program-family'
-{ attemptShell, attempt, execSync } = require './utils'
+{ attemptShell, attempt, execSync, hasProgramInstalled } = require './utils'
 logger = require './logger'
 styler = require './styler'
 ListString = require './list-string'
@@ -26,12 +26,12 @@ profilingOptions = []
                                 counter
                               } = {}) ->
     if gprof
-        unless attemptShell('which', 'gprof')?
+        unless hasProgramInstalled 'gprof'
             logger.e "Program #{styler.id 'gprof'} is required for this command.", { exit: yes, printStack: no }
     else
-        unless attemptShell('which', 'operf')?
+        unless hasProgramInstalled 'operf'
             logger.e "Program #{styler.id 'operf'} is required for this command.", { exit: yes, printStack: no }
-        unless attemptShell('which', 'opannotate')?
+        unless hasProgramInstalled 'opannotate'
             logger.e "Program #{styler.id 'opannotate'} is required for this command.", { exit: yes, printStack: no }
 
     programs = new ProgramFamily original, others

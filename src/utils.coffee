@@ -177,6 +177,9 @@ COMPARTMENT_SEPARATOR = " | "
 
     string
 
+@hasProgramInstalled = (progName) -> @attemptShell('which', progName)?
+
+
 # Testing Code
 ###
 @attempt(require('fs').unlinkSync, [''], exit: no, description: "Remove file without path")

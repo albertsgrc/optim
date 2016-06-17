@@ -1,7 +1,7 @@
 fs = require 'fs'
 path = require 'path'
 
-{ attemptShell, attempt, execSync } = require './utils'
+{ attemptShell, attempt, execSync, hasProgramInstalled } = require './utils'
 logger = require './logger'
 styler = require './styler'
 ProgramFamily = require './program-family'
@@ -15,7 +15,7 @@ module.exports = @
                                 all = no
                                 saveFile = no
                                } = {}) ->
-    unless attemptShell('which', 'objdump')?
+    unless hasProgramInstalled 'objdump'
         logger.e "Program #{styler.id 'objdump'} is required for this command.", { exit: yes, printStack: no }
 
     programs = new ProgramFamily original, others

@@ -31,6 +31,7 @@
     "distributions": "^0.2.1",
     "hasbin": "^1.2.2",
     "is-executable": "^1.0.1",
+    "is-root": "^1.0.0",
     "lodash": "^4.6.1",
     "readline-sync": "^1.4.1",
     "shell-quote": "^1.6.0",

@@ -177,7 +177,7 @@ COMPARTMENT_SEPARATOR = " | "
 
     string
 
-@hasProgramInstalled = (progName) -> @attemptShell('which', progName)?
+@hasProgramInstalled = (progName) => @attemptShell('which', progName)?
 
 
 # Testing Code

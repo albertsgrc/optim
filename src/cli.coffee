@@ -101,6 +101,7 @@ cli
         "Time limit for all repetitions of a single program time check."
     .option '-c, --confidence-rate <rate>',
         "Confidence rate for the T-Student test"
+    .option '-p, --set-high-priority', "Sets the program executions to high priority so that the OS doesn't switch them."
     .option '-a, --forward-args [program-specification:]<arguments-string>',
         "Forward arguments to the programs", Program.addArguments
     .option '-A, --all',

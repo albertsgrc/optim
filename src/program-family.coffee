@@ -45,7 +45,10 @@ module.exports = class ProgramFamily
         @allSortedByMt = _.sortBy(@all,
             (p) ->
                 stat = if p.hasSrcFile then p.srcFileStat else p.execFileStat
-                new Date(stat.mtime).getTime()
+                if stat?
+                    new Date(stat.mtime).getTime()
+                else
+                    0
             )
 
         @allExecutableSortedByMt = _.filter(@allSortedByMt, (p) -> p.hasExecFile)

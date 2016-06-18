@@ -2,7 +2,7 @@ logger = require './logger'
 styler = require './styler'
 ListString = require './list-string'
 isRoot = do require('is-root')
-{ attempt, execSync, hasProgramInstalled } = require './utils'
+{ attempt, execSync, hasProgramInstalled, normalizeError } = require './utils'
 { DFL_TIME_LIMIT, DFL_REPETITIONS } = require './constants'
 TIMER_CMD = ["#{__dirname}/timer/timer", "-ni"]
 TIMER_CMD_DONT_IGNORE = ["#{__dirname}/timer/timer", "-n"]
@@ -19,6 +19,7 @@ module.exports = class ProgramTiming
                    repetitions
                    timeLimit
                    setHighPriority
+                   @instrumented = no
                  } = {}) ->
         @repetitions = Math.round Number(repetitions ? @repetitions)
         @timeLimit = Number(timeLimit ? @timeLimit) # in secs
@@ -42,18 +43,32 @@ module.exports = class ProgramTiming
         logger.e("Time limit argument must be > 0", { exit: yes, printStack: no }) if @timeLimit <= 0
 
     _timeExec: (i) ->
-        timerCmd = if @program.hasOutput then TIMER_CMD_DONT_IGNORE else TIMER_CMD
+        timerCmd =
+            if ProgramTiming.instrumented
+                ""
+            else
+                if @program.hasOutput then TIMER_CMD_DONT_IGNORE else TIMER_CMD
         prolog = new ListString(ProgramTiming.priorityCmd, tasksetCmd, timerCmd).toString()
         result = attempt execSync, "#{prolog} #{@program.command}", { exit: no, printError: no }
 
         if result.isError
-            logger.write(styler.error(" ERROR:") + " #{result.stderr?[...-1]}").endLine()
+            logger.write(styler.error(" ERROR:") + " #{normalizeError result.stderr}").endLine()
             process.exit 1 if @program.isOriginal
             return false
 
         result = result.stderr
 
-        info = JSON.parse result
+        try
+            info = JSON.parse result
+        catch err
+            if ProgramTiming.instrumented
+                logger.space()
+                      .e "Invalid timing output format.
+                          Execute timer -ni timer to see the desired output format.",
+                          { exit: yes, printStack: no }
+            else
+                throw err
+
         info.cpu = info.user + info.sys
         info.cpu_ratio = 100*info.cpu/info.elapsed
 

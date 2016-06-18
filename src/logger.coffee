@@ -60,6 +60,8 @@ createWriter = (txt, styler, { stream = stdout, tagString = TAG_INDICATOR } = {}
 # Exposed methods
 @write = (str, stream = stdout) => stream.write str; @
 
+@space = (stream = stdout) => stream.write ' '; @
+
 @endLine = (stream = stdout) => stream.write "\n"; @openUpdate = no; @
 
 @eraseLine = (stream = stdout) => clearLine(stream); cursorTo(stream, 0); @

@@ -14,8 +14,8 @@ styler = require './styler'
 
 shelljs.config.silent = yes
 
-normalizeError = (err) ->
-    s = err.toString().replace("Error: ", "")
+@normalizeError = (err) ->
+    s = err.toString().replace("Error: ", "").replace(/\{\s"elapsed":\s[^,]*,\s"user":\s[^,]*,\s"sys":\s[^,]*,\s"mem_max":\s[^\}]*\}/, "")
     s = s[...-1] if s[s.length - 1] is '\n'
     s
 
@@ -28,7 +28,7 @@ handleError = (error, {
                         exitCode = 0  # if set to 0 defaults to (error.errno ? 1)
                         description = "" # String that will appear before the error text
                         printError = yes # Whether to print the error or not
-                      } = {}) ->
+                      } = {}) =>
     if (error.code? and error.code in allowedErrors) or
        (error.errno? and error.errno in allowedErrors) or
        (error.status? and error.status in allowedErrors)
@@ -36,9 +36,9 @@ handleError = (error, {
 
     errorMsg =
         if description.length
-            styler.id(description) + ": " + normalizeError(error)
+            styler.id(description) + ": " + @normalizeError(error)
         else
-            normalizeError(error)
+            @normalizeError(error)
 
     logger.e errorMsg, showStack: no if printError
 

@@ -75,11 +75,13 @@ prettySpeedup = (speedup) ->
 @time = (original, others, { forceRepetitions
                              repetitions
                              timeLimit
+                             setHighPriority
+                             instrumented
                              confidenceRate = DFL_CONFIDENCE_RATE
                              all = no
                              first = no
                            } = {}) ->
-    ProgramTiming.configure({ forceRepetitions, repetitions, timeLimit })
+    ProgramTiming.configure({ forceRepetitions, repetitions, timeLimit, setHighPriority, instrumented })
 
     programs = new ProgramFamily original, others
 

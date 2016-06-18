@@ -1,12 +1,13 @@
 os = require 'os'
+path = require 'path'
 uniqueFilename = require 'unique-filename'
 
-{ execSync, attempt, attemptShell } = require './utils'
+{ execSync, attempt, attemptShell, normalizeError } = require './utils'
 ProgramFamily = require './program-family'
 styler = require './styler'
 logger = require './logger'
 
-@check = (original, others, { all = no } = {}) ->
+@check = (original, others, { all = no, custom = no } = {}) ->
     programs = new ProgramFamily original, others
 
     # Check that all programs are executable
@@ -36,17 +37,38 @@ logger = require './logger'
                       { exit: no, printError: no }
 
         unless res.isError
-            res = attempt execSync, "cmp #{outputFileOriginal} #{outputFile}", exit: no, printError: no
-            if res.isError
-                if res.status is 1 # Files differ
-                    error = if res.stderr?.length then res.stderr[...-1] else res.stdout?[...-1]
-                    logger.write(styler.bad("not okay") + ": #{error}").endLine()
-                else # Another unknown error
-                    logger.write(styler.warn("couldn't check") + ": #{res.stderr?[...-1]}").endLine()
-            else # equal
-                logger.write(styler.okay("okay")).endLine()
+            if custom is no
+                res = attempt execSync, "cmp #{outputFileOriginal} #{outputFile}", exit: no, printError: no
+                if res.isError
+                    if res.status is 1 # Files differ
+                        error = if res.stderr?.length then res.stderr[...-1] else res.stdout?[...-1]
+                        logger.write(styler.bad("not okay") + ": #{error}").endLine()
+                    else # Another unknown error
+                        logger.write(styler.warn("couldn't check") + ": #{normalizeError res.stderr}").endLine()
+                else # equal
+                    logger.write(styler.okay("okay")).endLine()
+            else
+                try
+                    customEqualityChecker = require path.join(process.cwd(), custom)
+                catch error
+                    logger.e "An error occurred while requiring your custom equality checker: #{error.toString()}", { exit: yes, printStack: no }
+
+                if typeof customEqualityChecker.eq is "function"
+                    { equal: outputsEqual, message } = customEqualityChecker.eq outputFileOriginal, outputFile
+
+                    if outputsEqual
+                        logger.write(styler.okay("okay"))
+                    else
+                        logger.write(styler.bad("not okay"))
+
+                    if message?.length > 0
+                        logger.write ": #{message}"
+
+                    logger.endLine()
+                else
+                    logger.e "Your custom equality checker doesn't define an eq method", { exit: yes, printStack: no }
         else # Error while executing the program
-            logger.write(styler.error(" ERROR:") + " #{res.stderr?[...-1]}").endLine()
+            logger.write(styler.error(" ERROR:") + " #{normalizeError res.stderr}").endLine()
 
         attemptShell 'rm', outputFile
 

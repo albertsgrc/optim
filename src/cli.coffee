@@ -72,6 +72,7 @@ cli
     .option '-s, --input-string [program-specification:]<string>',
         "Specify string that will serve as input for the execution of the programs",
         Program.addInputString
+    .option '-c, --custom <equality-checker-js-file>', "Specify a custom equality checker. Should export an eq method which receives two strings." 
     .action check
 
 # Compile command

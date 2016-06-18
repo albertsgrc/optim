@@ -51,7 +51,7 @@ module.exports = class ProgramTiming
             process.exit 1 if @program.isOriginal
             return false
 
-        result = if @program.hasOutput then result.stderr else result.stdout
+        result = result.stderr
 
         info = JSON.parse result
         info.cpu = info.user + info.sys

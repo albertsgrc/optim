@@ -184,8 +184,8 @@ int main(int argc, char* argv[]) {
             _close(fd_stdout);
         }
 
-        if (non_interactive) print_result_non_interactive(ignore ? cout : cerr, elapsed, user, sys, mem_max);
-        else print_result_interactive(ignore ? cout : cerr, elapsed, user, sys, mem_max);
+        if (non_interactive) print_result_non_interactive(cerr, elapsed, user, sys, mem_max);
+        else print_result_interactive(cerr, elapsed, user, sys, mem_max);
     }
     else error("fork");
 

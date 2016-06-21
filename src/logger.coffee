@@ -13,7 +13,7 @@ styler = require './styler'
 [ INFO, WARN, ERROR, VERBOSE ] = TAGS = [ "INFO", "WARN", "ERROR", "VERBS" ]
 LEFT_MARGIN = _.maxBy(TAGS, _.size).length + 1
 LEFT_PADSTRING_LONG_LINES = _.repeat(" ", LEFT_MARGIN + TAG_INDICATOR.length)
-MAX_COLS_PER_LINE = stdout.columns - 1 # HACK: Assumes application won't last long
+MAX_COLS_PER_LINE = (stdout.columns ? Number.MAX_VALUE) - 1 # HACK: Assumes application won't last long
 
 # Private methods
 

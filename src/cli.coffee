@@ -44,11 +44,10 @@ checkCommandExists = ->
 ######### - CLI command, options and version definitions- ##########
 cli.version version
 
-# TODO: Features for PCA Project:
+# TODO: Optional features for PCA Project:
 # - Configuration file with default options
 # - Compilation via Makefiles
 # - Hability to define tasks, wich group commands
-# - Custom equality check
 
 # Subcommand-independent options
 cli
@@ -72,7 +71,7 @@ cli
     .option '-s, --input-string [program-specification:]<string>',
         "Specify string that will serve as input for the execution of the programs",
         Program.addInputString
-    .option '-c, --custom <equality-checker-js-file>', "Specify a custom equality checker. Should export an eq method which receives two strings." 
+    .option '-c, --custom <equality-checker-js-file>', "Specify a custom equality checker. Should export an eq method which receives two strings."
     .action check
 
 # Compile command

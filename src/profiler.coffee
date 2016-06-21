@@ -1,8 +1,9 @@
 fs = require 'fs'
 path = require 'path'
+_ = require 'lodash'
 
 ProgramFamily = require './program-family'
-{ attemptShell, attempt, execSync, hasProgramInstalled } = require './utils'
+{ attemptShell, attempt, execSync, hasProgramInstalled, optionAddHelper } = require './utils'
 logger = require './logger'
 styler = require './styler'
 ListString = require './list-string'
@@ -12,9 +13,9 @@ module.exports = @
 
 @OPERF_EVENTS_REGEX = new RegExp "^(#{(key for key of OPERF_EVENTS).join('|')})$"
 
-profilingOptions = []
+profilingOptions = {}
 
-@addProfilingOption = (option) -> profilingOptions.push(option)
+@addProfilingOption = _.partial optionAddHelper, profilingOptions
 
 @profile = (original, others, {
                                 event = 'cycles'
@@ -46,6 +47,8 @@ profilingOptions = []
     for program in programs.all
         continue unless program.ensureExecutable()
 
+        profilerArgs = new ListString profilingOptions.all ? "", profilingOptions[program.index] ? ""
+
         if gprof
             # Try to generate gmon.out file
             attempt execSync, program.command, { exit: no }
@@ -54,7 +57,7 @@ profilingOptions = []
                 logger.e "Program #{styler.id program.command} didn't generate a gmon.out file. Maybe you didn't compile it with -pg option?"
                 continue
 
-            gprofCmd = new ListString("gprof", "-b", profilingOptions, program.execFile).toString()
+            gprofCmd = new ListString("gprof", "-b", profilerArgs, program.execFile).toString()
 
             logger.i "Profiling #{styler.cmd gprofCmd}..."
 
@@ -62,7 +65,7 @@ profilingOptions = []
         else
             eventName = OPERF_EVENTS[event].event
             eventCount = if counter? then counter else OPERF_EVENTS[event].counter
-            operfCmd = new ListString("operf", "--event=#{eventName}:#{eventCount}").toString()
+            operfCmd = new ListString("operf", "--event=#{eventName}:#{eventCount}", profilerArgs).toString()
             cmd = "#{operfCmd} #{program.command}"
 
             logger.i "Profiling #{styler.cmd cmd}..."

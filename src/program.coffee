@@ -3,7 +3,7 @@ path = require 'path'
 assert = require 'assert'
 hasbin = require 'hasbin'
 
-{ getFileInfo, attempt, execSync, hasLaterModificationTime, isExecutable } = require './utils'
+{ getFileInfo, attempt, execSync, hasLaterModificationTime, isExecutable, optionAddHelper } = require './utils'
 SRC_EXTENSIONS = require './source-extensions'
 ListString = require './list-string'
 logger = require './logger'
@@ -36,32 +36,6 @@ module.exports = class Program
             return { srcFile, srcFileStat, srcExtension, compiler, language } if srcFileStat?
 
         {}
-
-    addHelper = (where, argspec) ->
-        assert(_.isString(argspec), "Argument argspec must be a string")
-
-        info = argspec.split ":"
-
-        add = (who, what) ->
-            if where[who]?
-                where[who].pushBack what
-            else
-                where[who] = new ListString(what.split(','))
-
-        if info.length is 1
-            add 'all', argspec
-        else
-            [specificationStr, what] = info
-
-            if specificationStr.length is 0 or 'all' in specification = specificationStr.split ","
-                add 'all', what
-            else
-                for program in _.uniq specification
-                    if isNaN(program) or not _.isLength(Number(program))
-                        logger.w "#{program} is not a valid program specifier, should be natural number, ignoring..."
-                    else
-                        add program, what
-
 
     joinAllWithThis = (structure, programIndex) =>
         all = structure.all ? ""
@@ -153,15 +127,15 @@ module.exports = class Program
     @inputStringsByProgram: {}
     @outputFilesByProgram: {}
 
-    @addArguments: _.partial addHelper, Program.argumentsByProgram
+    @addArguments: _.partial optionAddHelper, Program.argumentsByProgram
 
-    @addFlags: _.partial addHelper, Program.flagsByProgram
+    @addFlags: _.partial optionAddHelper, Program.flagsByProgram
 
-    @addInputFile: _.partial addHelper, Program.inputFilesByProgram
+    @addInputFile: _.partial optionAddHelper, Program.inputFilesByProgram
 
-    @addInputString: _.partial addHelper, Program.inputStringsByProgram
+    @addInputString: _.partial optionAddHelper, Program.inputStringsByProgram
 
-    @addOutputFile: _.partial addHelper, Program.outputFilesByProgram
+    @addOutputFile: _.partial optionAddHelper, Program.outputFilesByProgram
 
     constructor: (@execFile, { @isGuessed = no, @isOriginal = no } = {}) ->
         assert _.isString(@execFile), "Executable file is not a String"
@@ -172,7 +146,7 @@ module.exports = class Program
         @hasSrcFile =  @srcFileStat?
         @hasExecFile = @execFileStat?
         @hasBinaryInPath = hasbin.sync @execFile
-        @index = Program.currentIndex++
+        @index = Program.currentIndex++ # TODO: Fix issue about this being incorrect when some programs are discarded
 
         @arguments = joinAllWithThis Program.argumentsByProgram, @index
         @compilationFlags = calculateCompilationFlags @execFile, @execExtension, @index, @isGuessed

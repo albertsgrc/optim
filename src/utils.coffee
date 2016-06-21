@@ -179,6 +179,31 @@ COMPARTMENT_SEPARATOR = " | "
 
 @hasProgramInstalled = (progName) => @attemptShell('which', progName)?
 
+@optionAddHelper = (where, argspec) ->
+    assert(_.isString(argspec), "Argument argspec must be a string")
+
+    info = argspec.split ":"
+
+    add = (who, what) ->
+        if where[who]?
+            where[who].pushBack what.split(',')
+        else
+            where[who] = new ListString(what.split(','))
+
+    if info.length is 1
+        add 'all', argspec
+    else
+        [specificationStr, what] = info
+
+        if specificationStr.length is 0 or 'all' in specification = specificationStr.split ","
+            add 'all', what
+        else
+            for program in _.uniq specification
+                if isNaN(program) or not _.isLength(Number(program))
+                    logger.w "#{program} is not a valid program specifier, should be natural number, ignoring..."
+                else
+                    add program, what
+
 
 # Testing Code
 ###

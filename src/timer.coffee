@@ -92,6 +92,9 @@ prettySpeedup = (speedup) ->
 
     programs = new ProgramFamily original, others, { indexFilter }
 
+    unless all
+        programs.original ?= programs.others.shift()
+
     unless programs.original?
         logger.w("No program was found matching #{styler.id original}")
         process.exit 0

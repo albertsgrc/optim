@@ -15,13 +15,13 @@ COMPILER_FLAGS = require './compiler-flags'
 module.exports = class Program
     getExecFileInfo = (execFile) ->
         { dir, name, ext: extension } = path.parse execFile
-        extension = extension[1..] # Remove dot
 
+        extension = extension[1..] # Remove dot
         # If file is name.ext1.ext2 then the parsed ext is '.ext1' and name is
         # 'name.ext1', but we need name to be 'name' and ext to be '.ext1.ext2'
         firstDotIndex = name.indexOf '.'
         if firstDotIndex isnt -1
-            extension = name[firstDotIndex+1...] + extension
+            extension = "#{name[firstDotIndex+1...]}.#{extension}"
             name = name[0...firstDotIndex]
 
         # TODO: Maybe exit and print error if isn't executable??

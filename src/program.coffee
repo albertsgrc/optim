@@ -41,7 +41,7 @@ module.exports = class Program
         all = structure.all ? ""
         prog = structure[programIndex] ? ""
 
-        new ListString(all, prog)
+        new ListString(prog, all)
 
     calculateCompilationFlags = (execFile, ext, programIndex, isGuessed) =>
         invalidFlag = (flag) =>
@@ -202,7 +202,7 @@ module.exports = class Program
 
         inputStringsString =
             if @inputStrings.array.length > 0
-                "echo \"#{@inputStrings.array.join("\n")}\" | "
+                "echo \"#{@inputStrings.array.join("")}\" | "
             else
                 ""
         @command = inputStringsString + new ListString(@execFile, @arguments, inputFilesFormatted, outputFilesFormatted).toString()

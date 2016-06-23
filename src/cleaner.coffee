@@ -21,7 +21,7 @@ _ = require 'lodash'
             (file) ->
                 isBinaryExecutable(file) or
                 file.match(/\.out$/) or
-                file.match(/oprofile_data/) or
+                file is "oprofile_data" or
                 (ultraDeep and (
                     file is PROFILING_OUTPUT_FOLDER
                 ))

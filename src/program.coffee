@@ -120,7 +120,6 @@ module.exports = class Program
             hasLaterModificationTime(program.srcFileStat, program.execFileStat)
         )
 
-    @currentIndex: 0
     @argumentsByProgram: {}
     @flagsByProgram: {}
     @inputFilesByProgram: {}
@@ -146,26 +145,6 @@ module.exports = class Program
         @hasSrcFile =  @srcFileStat?
         @hasExecFile = @execFileStat?
         @hasBinaryInPath = hasbin.sync @execFile
-        @index = Program.currentIndex++ # TODO: Fix issue about this being incorrect when some programs are discarded
-
-        @arguments = joinAllWithThis Program.argumentsByProgram, @index
-        @compilationFlags = calculateCompilationFlags @execFile, @execExtension, @index, @isGuessed
-        @inputStrings = joinAllWithThis Program.inputStringsByProgram, @index
-        @inputFiles = joinAllWithThis Program.inputFilesByProgram, @index
-        @outputFiles = joinAllWithThis Program.outputFilesByProgram, @index
-
-        @hasInput = @inputStrings.array.length > 0 or @inputFiles.array.length > 0
-        @hasOutput = @outputFiles.array.length > 0
-
-        inputFilesFormatted = _.flatten @inputFiles.array.map((s) -> ['<', s])
-        outputFilesFormatted = _.flatten @outputFiles.array.map((s) -> ['>', s])
-
-        inputStringsString =
-            if @inputStrings.length > 0
-                "echo #{@inputStrings.array.join("\n")} | "
-            else
-                ""
-        @command = inputStringsString + new ListString(@execFile, @arguments, inputFilesFormatted, outputFilesFormatted).toString()
 
     compile: (explicitlyDemanded = no) ->
         unless @hasSrcFile or @hasExecFile
@@ -207,6 +186,26 @@ module.exports = class Program
         @hasExecFile or @hasBinaryInPath
 
     toString: -> @command
+
+    setIndex: (@index) ->
+        @arguments = joinAllWithThis Program.argumentsByProgram, @index
+        @compilationFlags = calculateCompilationFlags @execFile, @execExtension, @index, @isGuessed
+        @inputStrings = joinAllWithThis Program.inputStringsByProgram, @index
+        @inputFiles = joinAllWithThis Program.inputFilesByProgram, @index
+        @outputFiles = joinAllWithThis Program.outputFilesByProgram, @index
+
+        @hasInput = @inputStrings.array.length > 0 or @inputFiles.array.length > 0
+        @hasOutput = @outputFiles.array.length > 0
+
+        inputFilesFormatted = _.flatten @inputFiles.array.map((s) -> ['<', s])
+        outputFilesFormatted = _.flatten @outputFiles.array.map((s) -> ['>', s])
+
+        inputStringsString =
+            if @inputStrings.length > 0
+                "echo #{@inputStrings.array.join("\n")} | "
+            else
+                ""
+        @command = inputStringsString + new ListString(@execFile, @arguments, inputFilesFormatted, outputFilesFormatted).toString()
 
 
 

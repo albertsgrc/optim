@@ -8,7 +8,11 @@ styler = require './styler'
 logger = require './logger'
 
 @check = (original, others, { all = no, custom = no } = {}) ->
-    programs = new ProgramFamily original, others
+    indexFilter =
+        unless all
+            [ { index: 0 }, { type: 'mtexec', index: -1 } ]
+
+    programs = new ProgramFamily original, others, { indexFilter }
 
     # Check that all programs are executable
 
@@ -17,9 +21,6 @@ logger = require './logger'
     unless programs.others.length > 0
         logger.w("No program was found to compare with #{styler.id original}")
         process.exit 0
-
-    unless all
-        programs.others = programs.allExecutableSortedByMt[-1..]
 
     outputFileOriginal = uniqueFilename os.tmpDir()
 

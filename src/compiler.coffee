@@ -4,9 +4,10 @@ ProgramFamily = require './program-family'
     if single
         programs = new ProgramFamily first, others, { shouldGuess: no }
     else
-        programs = new ProgramFamily first, others
+        indexFilter =
+            if last
+                [ { index: 0 }, { type: 'mt', index: -1 } ]
 
-        if last and programs.all.length > 1
-            programs.all = [programs.allSortedByMt[0], programs.allSortedByMt[-1..][0]]
+        programs = new ProgramFamily first, others, { indexFilter }
 
     do programs.compile

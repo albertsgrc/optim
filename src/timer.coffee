@@ -83,16 +83,14 @@ prettySpeedup = (speedup) ->
                            } = {}) ->
     ProgramTiming.configure({ forceRepetitions, repetitions, timeLimit, setHighPriority, instrumented })
 
-    programs = new ProgramFamily original, others
-
-    unless all
-        lastTwo =
+    indexFilter =
+        unless all
             if first
-                [programs.original].concat(programs.allExecutableSortedByMt[-1..])
+                [ { index: 0 }, { type: 'mtexec', index: -1 } ]
             else
-                programs.allExecutableSortedByMt[-2..]
-        programs.original = lastTwo[0]
-        programs.others = if lastTwo.length > 1 then [lastTwo[1]] else []
+                [ { type: 'mtexec', index: -2 }, { type: 'mtexec', index: -1 } ]
+
+    programs = new ProgramFamily original, others, { indexFilter }
 
     unless programs.original?
         logger.w("No program was found matching #{styler.id original}")

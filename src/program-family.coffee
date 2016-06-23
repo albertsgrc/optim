@@ -20,40 +20,60 @@ module.exports = class ProgramFamily
                 maybeDot = if execExtension.length > 0 then "." else ""
                 "#{path.join(dir2, name)}#{maybeDot}#{execExtension}"
 
-        found = _.union(sources, executables).sort().map((s) -> path.join(dir, s))
+        _.union(sources, executables).sort().map((s) -> new Program path.join(dir, s), { isGuessed: yes })
 
-        programs =
-            for execFile, index in found
-                new Program(execFile, isGuessed: yes)
-
-        programs
-
-    constructor: (@original, @others = [], { shouldGuess = yes } = {}) ->
-        @original = new Program(@original, { isOriginal: yes }) if _.isString @original
-
-        assert(@original instanceof Program, "original parameter is not a program nor string")
-
-        if shouldGuess and @others.length is 0
-            @others = guessOthers(@original)
-        else
-            @others[i] = new Program(v) for v, i in @others
-
+    constructor: (@original, @others = [], { shouldGuess = yes, indexFilter } = {}) ->
         assert(_.isArray(@others), "others must be an array, instead it was: #{util.inspect @others}")
+        assert(_.isString(@original), "original parameter is not a string")
 
-        @all = [@original].concat(@others)
+        @original = new Program(@original, { isOriginal: yes })
 
-        @allSortedByMt = _.sortBy(@all,
-            (p) ->
-                stat = if p.hasSrcFile then p.srcFileStat else p.execFileStat
-                if stat?
-                    new Date(stat.mtime).getTime()
-                else
-                    0
-            )
+        guessed =
+            if shouldGuess and @others.length is 0
+                guessOthers @original, { isOriginal: yes }
+            else
+                []
 
-        @allExecutableSortedByMt = _.filter(@allSortedByMt, (p) -> p.hasExecFile)
-    compile: ->
-        program.compile() for program in @all
+        @all = [@original]
+                .concat(new Program p for p in @others)
+                .concat(guessed)
+
+        allSortedByMt = _.sortBy(@all,
+                    (p) ->
+                        stat = if p.hasSrcFile then p.srcFileStat else p.execFileStat
+                        if stat?
+                            new Date(stat.mtime).getTime()
+                        else
+                            0
+                )
+        allExecutableSortedByMt = _.filter(allSortedByMt, (p) -> p.hasExecFile)
+
+        if indexFilter?
+            for filter, i in indexFilter
+                arr =
+                    if filter.type is 'mt'
+                        allSortedByMt
+                    else if filter.type is 'mtexec'
+                        allExecutableSortedByMt
+                    else
+                        @all
+
+                index = if filter.index < 0 then arr.length + filter.index else filter.index
+
+                indexFilter[i] = @all.indexOf(arr[index])
+
+            @all = (elem for elem, i in @all when i in indexFilter)
+
+        @original = null unless @all[0]?.isOriginal
+        @others = []
+
+        for program, i in @all
+            @all[i].setIndex i
+
+            if not program.isOriginal
+                @others.push program
+
+    compile: -> program.compile() for program in @all
 
 
 # Testing code

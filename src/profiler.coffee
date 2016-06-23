@@ -35,10 +35,12 @@ profilingOptions = {}
         unless hasProgramInstalled 'opannotate'
             logger.e "Program #{styler.id 'opannotate'} is required for this command.", { exit: yes, printStack: no }
 
-    programs = new ProgramFamily original, others
 
-    unless all
-        programs.all = programs.allExecutableSortedByMt[-1..]
+    indexFilter =
+        unless all
+            [ { type: 'mtexec', index: -1 }]
+
+    programs = new ProgramFamily original, others, { indexFilter }
 
     unless programs.all.length
         logger.w("No program was found matching #{styler.id original}")

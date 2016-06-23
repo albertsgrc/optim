@@ -201,12 +201,11 @@ module.exports = class Program
         outputFilesFormatted = _.flatten @outputFiles.array.map((s) -> ['>', s])
 
         inputStringsString =
-            if @inputStrings.length > 0
-                "echo #{@inputStrings.array.join("\n")} | "
+            if @inputStrings.array.length > 0
+                "echo \"#{@inputStrings.array.join("\n")}\" | "
             else
                 ""
         @command = inputStringsString + new ListString(@execFile, @arguments, inputFilesFormatted, outputFilesFormatted).toString()
-
 
 
 

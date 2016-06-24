@@ -14,6 +14,9 @@ logger = require './logger'
 
     programs = new ProgramFamily original, others, { indexFilter }
 
+    unless all
+        programs.original ?= programs.others.shift()
+
     # Check that all programs are executable
 
     return unless programs.original.ensureExecutable()

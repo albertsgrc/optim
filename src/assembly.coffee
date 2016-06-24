@@ -41,12 +41,15 @@ module.exports = @
         continue if result.isError
 
         if saveFile
-            if saveFile is yes
-                saveFile = "#{program.execFile}_#{new Date().getTime()}.s"
+            file =
+                if saveFile is yes
+                    "#{program.execFile}_#{new Date().getTime()}.s"
+                else
+                    saveFile
 
             attemptShell "mkdir", ['-p', ASSEMBLY_OUTPUT_FOLDER]
 
-            outPath = path.join ASSEMBLY_OUTPUT_FOLDER, saveFile
+            outPath = path.join ASSEMBLY_OUTPUT_FOLDER, file
 
             fs.writeFileSync(outPath, result.stdout, { encoding: 'utf-8' })
 

@@ -1,7 +1,7 @@
 { attemptShell, isBinaryExecutable , hasProgramInstalled} = require './utils'
 logger = require './logger'
 styler = require './styler'
-{ PROFILING_OUTPUT_FOLDER } = require './constants'
+{ PROFILING_OUTPUT_FOLDER, ASSEMBLY_OUTPUT_FOLDER } = require './constants'
 _ = require 'lodash'
 
 @clean = ({ recursive = no, ultraDeep = no, deep = ultraDeep, } = {}) ->
@@ -23,7 +23,7 @@ _ = require 'lodash'
                 file.match(/\.out$/) or
                 file is "oprofile_data" or
                 (ultraDeep and (
-                    file is PROFILING_OUTPUT_FOLDER
+                    file in [PROFILING_OUTPUT_FOLDER, ASSEMBLY_OUTPUT_FOLDER]
                 ))
         else
             isBinaryExecutable

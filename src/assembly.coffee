@@ -14,14 +14,16 @@ module.exports = @
                                 pretty = no
                                 all = no
                                 saveFile = no
+                                literal
                                } = {}) ->
     unless hasProgramInstalled 'objdump'
         logger.e "Program #{styler.id 'objdump'} is required for this command.", { exit: yes, printStack: no }
 
-    programs = new ProgramFamily original, others
+    indexFilter =
+        unless all
+            [ { type: 'mtexec', index: -1 }]
 
-    unless all
-        programs.all = programs.allExecutableSortedByMt[-1..]
+    programs = new ProgramFamily original, others, { indexFilter, shouldGuess: literal }
 
     unless programs.all.length
         logger.w("No program was found matching #{styler.id original}")

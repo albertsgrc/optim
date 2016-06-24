@@ -82,7 +82,7 @@ cli
     .description "Compile the given programs"
     .option '-f, --flags [program-specification:]<flags-string>',
         "Indicate flags to forward to the compilation of programs", Program.addFlags
-    .option '-s, --single', 'Only compile the given program. Otherwise, similar
+    .option '-L, --literal', 'Only compile the given program. Otherwise, similar
                              programs are searched and compiled in lexicographic order'
     .option '-l, --last', 'Only compile the original and lastly modified programs'
     .action compile
@@ -122,6 +122,7 @@ cli
     .command 'profile <program> [others...]'
     .alias 'p'
     .description 'Profile the given programs'
+    .option '-L, --literal', "Profile only the given program"
     .option '-A, --all',
         "Profile all programs. Otherwise profile only the program with latest modification time"
     .option '-e, --event [event]',
@@ -153,6 +154,7 @@ cli
     .command 'assembly <program> [others...]'
     .alias 'a'
     .description 'Output assembly code of an executable'
+    .option '-L, --literal', "Profile only the given program"
     .option '-p, --pretty', "Interleave assembly with the corresponding lines of code"
     .option '-A, --all',
         "Output assembly of all programs. Otherwise only of the program with latest modification time"

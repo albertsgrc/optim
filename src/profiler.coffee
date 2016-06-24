@@ -24,6 +24,7 @@ profilingOptions = {}
                                 clean = yes
                                 saveFile = no
                                 all = no
+                                literal
                                 counter
                               } = {}) ->
     if gprof
@@ -40,7 +41,7 @@ profilingOptions = {}
         unless all
             [ { type: 'mtexec', index: -1 }]
 
-    programs = new ProgramFamily original, others, { indexFilter }
+    programs = new ProgramFamily original, others, { indexFilter, shouldGuess: literal }
 
     unless programs.all.length
         logger.w("No program was found matching #{styler.id original}")

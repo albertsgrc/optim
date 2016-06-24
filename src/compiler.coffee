@@ -1,7 +1,7 @@
 ProgramFamily = require './program-family'
 
-@compile = (first, others = [], { single = no, last = no } = {}) ->
-    if single
+@compile = (first, others = [], { last = no, literal = no } = {}) ->
+    if literal
         programs = new ProgramFamily first, others, { shouldGuess: no }
     else
         indexFilter =

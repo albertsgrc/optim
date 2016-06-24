@@ -88,7 +88,7 @@ profilingOptions = {}
             if saveFile
                 if saveFile is yes
                     profileMark = if gprof then "gprof" else "ann"
-                    saveFile = "#{program.execFile}_#{new Date().getTime()}.#{profileMark}.txt"
+                    saveFile = "#{program.execFile}_#{new Date().getTime()}.#{if assembly then "s." else ""}#{profileMark}.txt"
 
                 attemptShell "mkdir", ['-p', PROFILING_OUTPUT_FOLDER]
 

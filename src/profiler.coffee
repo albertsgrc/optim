@@ -83,8 +83,6 @@ profilingOptions = {}
             result = attempt execSync, opannotateCmd, { exit: no }
 
         unless result.isError
-            logger.noTag result.stdout
-
             if saveFile
                 if saveFile is yes
                     profileMark = if gprof then "gprof" else "ann"
@@ -95,6 +93,10 @@ profilingOptions = {}
                 outPath = path.join PROFILING_OUTPUT_FOLDER, saveFile
 
                 fs.writeFileSync(outPath, result.stdout, { encoding: 'utf-8' })
+
+                logger.i "Profiling written to file #{styler.id outPath}"
+            else
+                logger.noTag result.stdout
 
 
     if clean

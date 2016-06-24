@@ -40,8 +40,6 @@ module.exports = @
 
         continue if result.isError
 
-        logger.noTag result.stdout
-
         if saveFile
             if saveFile is yes
                 saveFile = "#{program.execFile}_#{new Date().getTime()}.s"
@@ -51,3 +49,7 @@ module.exports = @
             outPath = path.join ASSEMBLY_OUTPUT_FOLDER, saveFile
 
             fs.writeFileSync(outPath, result.stdout, { encoding: 'utf-8' })
+
+            logger.i "Assembly written to file #{styler.id outPath}"
+        else
+            logger.noTag result.stdout

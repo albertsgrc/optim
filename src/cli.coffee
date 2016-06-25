@@ -103,7 +103,7 @@ cli
         "Confidence rate for the T-Student test."
     .option '-p, --previous',
         "Compute speedup with respect to the previous program"
-    .option '-h, --set-high-priority', "Sets the program executions to high priority so that the OS doesn't switch them."
+    .option '-H, --set-high-priority', "Sets the program executions to high priority so that the OS doesn't switch them."
     .option '-I, --instrumented', "Timing is gathered from program's stderr output. Should mimic \"timer -ni\" cmd output format."
     .option '-a, --forward-args [program-specification:]<arguments-string>',
         "Forward arguments to the programs", Program.addArguments

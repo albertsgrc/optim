@@ -47,6 +47,8 @@ module.exports = @
 @DFL_REPETITIONS = 15
 @DFL_TIME_LIMIT = 15
 
+@CSV_OUTPUT_FOLDER = "csv"
+
 # General
 @DFL_DECIMAL_PLACES = 3
 

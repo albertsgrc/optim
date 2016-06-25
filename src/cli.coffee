@@ -101,7 +101,9 @@ cli
         "Time limit for all repetitions of a single program time check."
     .option '-c, --confidence-rate <rate>',
         "Confidence rate for the T-Student test."
-    .option '-p, --set-high-priority', "Sets the program executions to high priority so that the OS doesn't switch them."
+    .option '-p, --previous',
+        "Compute speedup with respect to the previous program"
+    .option '-h, --set-high-priority', "Sets the program executions to high priority so that the OS doesn't switch them."
     .option '-I, --instrumented', "Timing is gathered from program's stderr output. Should mimic \"timer -ni\" cmd output format."
     .option '-a, --forward-args [program-specification:]<arguments-string>',
         "Forward arguments to the programs", Program.addArguments
@@ -115,6 +117,7 @@ cli
     .option '-o, --output-file [program-specification:]<file>',
         "Specify file that will serve as output for the execution of the programs.
          If not specified output is ignored", Program.addOutputFile
+    .option '-C, --csv [file]', "Output a CSV file with the data."
     .action time
 
 # Profile command

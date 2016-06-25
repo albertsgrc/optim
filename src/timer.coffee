@@ -1,12 +1,13 @@
 { Studentt } = require 'distributions'
 chalk = require 'chalk256'
+fs = require 'fs'
 
 ProgramFamily = require './program-family'
 ProgramTiming = require './program-timing'
 logger = require './logger'
-{ prettyDecimal, compartimentedString } = require './utils'
+{ prettyDecimal, compartimentedString, attemptShell } = require './utils'
 styler = require './styler'
-{ DFL_DECIMAL_PLACES: DECIMALS, DFL_CONFIDENCE_RATE } = require './constants'
+{ DFL_DECIMAL_PLACES: DECIMALS, DFL_CONFIDENCE_RATE, CSV_OUTPUT_FOLDER } = require './constants'
 
 SPACES_BY_COL = [
     10
@@ -80,8 +81,12 @@ prettySpeedup = (speedup) ->
                              confidenceRate = DFL_CONFIDENCE_RATE
                              all = no
                              first = no
+                             previous = no
+                             csv = no
                            } = {}) ->
     ProgramTiming.configure({ forceRepetitions, repetitions, timeLimit, setHighPriority, instrumented })
+
+    timings = []
 
     indexFilter =
         unless all
@@ -112,17 +117,22 @@ prettySpeedup = (speedup) ->
                                       { value: chalk.bold("Memory") }
                                       { value: chalk.bold("Reps") })
 
-    originalTiming = programs.original.time()
+    speedupModel = programs.original.time()
+    speedupModel.cpu_s = speedupModel.elp_s = 1
+
+    timings.push speedupModel
 
     logger.noTag compartimentedString(SPACES_BY_COL,
                                       { value: styler.normal("N/A"), padKind: "Start" },
                                       { value: styler.normal("N/A") },
-                                      { value: "#{styler.value(toSecs(originalTiming.cpu))}#{styler.unit 's'}" },
+                                      { value: "#{styler.value(toSecs(speedupModel.cpu))}#{styler.unit 's'}" },
                                       { value: styler.normal("N/A") },
-                                      { value: "#{styler.value(toSecs(originalTiming.elapsed))}#{styler.unit 's'}" }
-                                      { value: "#{styler.value(prettyDecimal(originalTiming.cpu_ratio, 2))}#{styler.unit '%'}" }
-                                      { value: "#{prettyMemory originalTiming.mem_max}" },
-                                      { value: "#{styler.value originalTiming.repetitions}" })
+                                      { value: "#{styler.value(toSecs(speedupModel.elapsed))}#{styler.unit 's'}" }
+                                      { value: "#{styler.value(prettyDecimal(speedupModel.cpu_ratio, 2))}#{styler.unit '%'}" }
+                                      { value: "#{prettyMemory speedupModel.mem_max}" },
+                                      { value: "#{styler.value speedupModel.repetitions}" })
+
+
 
     for program in programs.others
         continue unless program.ensureExecutable()
@@ -131,9 +141,13 @@ prettySpeedup = (speedup) ->
 
         continue unless timing.success
 
-        isFasterThanOriginal = isFaster timing, originalTiming, confidenceRate
-        cpuSpeedup = originalTiming.cpu/timing.cpu
-        elpSpeedup = originalTiming.elapsed/timing.elapsed
+        isFasterThanOriginal = isFaster timing, speedupModel, confidenceRate
+        cpuSpeedup = timing.cpu_s = speedupModel.cpu/timing.cpu
+        elpSpeedup = timing.elp_s = speedupModel.elapsed/timing.elapsed
+
+        timings.push timing
+
+        speedupModel = timing if previous
 
         fasterString =
             if isFasterThanOriginal?
@@ -150,6 +164,17 @@ prettySpeedup = (speedup) ->
                                           { value: "#{styler.value(toSecs(timing.cpu))}#{styler.unit 's'}" },
                                           { value: "#{prettySpeedup elpSpeedup }", space: SPACES_BY_COL[3] }
                                           { value: "#{styler.value(toSecs(timing.elapsed))}#{styler.unit 's'}" }
-                                          { value: "#{styler.value(prettyDecimal(originalTiming.cpu_ratio, 2))}#{styler.unit '%'}" }
+                                          { value: "#{styler.value(prettyDecimal(timing.cpu_ratio, 2))}#{styler.unit '%'}" }
                                           { value: "#{prettyMemory timing.mem_max}" },
                                           { value: "#{styler.value timing.repetitions}" })
+
+    if csv
+        csv = "#{new Date().getTime()}.csv" if csv is yes
+
+        csvString = "data,#{(program.execFile for program in programs.all).join(",")}\n"
+
+        for prop in ['user', 'sys', 'cpu', 'elapsed', 'repetitions', 'cpu_s', 'elp_s', 'mem_max', 'cpu_ratio']
+            csvString += "#{prop},#{(timing[prop] for timing in timings).join(",")}\n"
+
+        attemptShell "mkdir", ['-p', CSV_OUTPUT_FOLDER]
+        fs.writeFileSync "./#{CSV_OUTPUT_FOLDER}/#{csv}", csvString, { encoding: 'utf-8' }

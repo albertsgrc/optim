@@ -1,5 +1,6 @@
 os = require 'os'
 path = require 'path'
+fs = require 'fs'
 uniqueFilename = require 'unique-filename'
 
 { execSync, attempt, attemptShell, normalizeError } = require './utils'
@@ -58,7 +59,9 @@ logger = require './logger'
                     logger.e "An error occurred while requiring your custom equality checker: #{error.toString()}", { exit: yes, printStack: no }
 
                 if typeof customEqualityChecker.eq is "function"
-                    { equal: outputsEqual, message } = customEqualityChecker.eq outputFileOriginal, outputFile
+                    outputOriginal = fs.readFileSync(outputFileOriginal, encoding: 'utf-8')
+                    outputNew = fs.readFileSync(outputFile, encoding: 'utf-8')
+                    { equal: outputsEqual, message } = customEqualityChecker.eq outputOriginal, outputNew
 
                     if outputsEqual
                         logger.write(styler.okay("okay"))

@@ -33,6 +33,7 @@ module.exports = @
     rm: 'clean'
     cln: 'clean'
     eq: 'equal'
+    check: 'equal'
     pf: 'profile'
     make: 'compile'
 

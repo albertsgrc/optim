@@ -31,7 +31,6 @@ cli.notEnoughArguments = process.argv.length <= N_META_ARGUMENTS
 # Replace the command argument if it is a second alias defined for convenience
 # (Commander only allows one alias per command)
 tryToReplaceSecondAlias = ->
-
     realCommand = SECOND_ALIAS_FOR_COMMANDS[process.argv[N_META_ARGUMENTS]]
     process.argv[N_META_ARGUMENTS] = realCommand if realCommand?
 

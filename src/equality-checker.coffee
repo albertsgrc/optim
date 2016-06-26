@@ -34,7 +34,7 @@ logger = require './logger'
         attempt execSync, "#{programs.original.command} > #{outputFileOriginal}"
     else
         outputFileOriginal = against
-        
+
     for program in programs.others
         continue unless program.ensureExecutable()
 
@@ -83,4 +83,5 @@ logger = require './logger'
 
         attemptShell 'rm', outputFile
 
-    attemptShell 'rm', outputFileOriginal
+    if against is no
+        attemptShell 'rm', outputFileOriginal

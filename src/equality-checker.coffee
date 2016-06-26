@@ -8,7 +8,7 @@ ProgramFamily = require './program-family'
 styler = require './styler'
 logger = require './logger'
 
-@check = (original, others, { all = no, custom = no } = {}) ->
+@check = (original, others, { all = no, custom = no, against = no } = {}) ->
     indexFilter =
         unless all
             [ { index: 0 }, { type: 'mtexec', index: -1 } ]
@@ -20,17 +20,21 @@ logger = require './logger'
 
     # Check that all programs are executable
 
-    return unless programs.original.ensureExecutable()
+    if against is no
+        return unless programs.original.ensureExecutable()
 
-    unless programs.others.length > 0
-        logger.w("No program was found to compare with #{styler.id original}")
-        process.exit 0
+        unless programs.others.length > 0
+            logger.w("No program was found to compare with #{styler.id original}")
+            process.exit 0
 
-    outputFileOriginal = uniqueFilename os.tmpDir()
+        outputFileOriginal = uniqueFilename os.tmpDir()
 
-    logger.i "Executing original program #{styler.id programs.original.toString()}..."
+        logger.i "Executing original program #{styler.id programs.original.toString()}..."
 
-    attempt execSync, "#{programs.original.command} > #{outputFileOriginal}"
+        attempt execSync, "#{programs.original.command} > #{outputFileOriginal}"
+    else
+        outputFileOriginal = against
+        
     for program in programs.others
         continue unless program.ensureExecutable()
 

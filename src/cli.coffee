@@ -64,6 +64,7 @@ cli
         "Forward arguments to the programs", Program.addArguments
     .option '-A, --all',
         "Check equality for all programs. Otherwise check only for the program with latest modification time"
+    .option '-g, --against <file>', "Check against file instead of original"
     .option '-i, --input-file [program-specification:]<file>',
         "Specify file that will serve as input for the execution of the programs",
         Program.addInputFile
